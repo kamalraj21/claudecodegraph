@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Claude for Technical Writers — Knowledge Graph by Kamal Raj</title>
+<meta name="description" content="An interactive knowledge graph of Claude for technical writers, with guided walkthroughs and copyable prompts. By Kamal Raj.">
+<meta property="og:title" content="Claude for Technical Writers — Knowledge Graph">
+<meta property="og:description" content="55 nodes, guided walkthroughs, copyable prompts. Learn how Claude fits into every technical writing workflow.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kamalraj21.github.io/claude-for-tw/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="author" content="Kamal Raj">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root{
+  --bg:#050608;--surface:#0c0f16;
+  --glass:rgba(12,14,22,0.88);--glass2:rgba(10,12,20,0.97);
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.15);
+  --text:#eef0f8;--text-mid:#8292b0;--text-dim:#3a4860;
+  --core:#f5c842;--model:#4db8ff;--tools:#2edccc;--skills:#6dda5a;
+  --integr:#ff9d42;--rag:#d966f0;--writing:#ff5f7a;--output:#7ed9b8;
+  --l10n:#ff7a52;--process:#a07cf5;
+  --hh:56px;--fh:42px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);
+  font-family:'JetBrains Mono',monospace;overflow:hidden;-webkit-font-smoothing:antialiased}
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ═══ WELCOME SCREEN ═══════════════════════════════════════════════════ */
+#welcome{position:fixed;inset:0;z-index:950;background:var(--bg);
+  display:flex;align-items:flex-start;justify-content:center;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  transition:opacity .5s}
+#welcome.out{opacity:0;pointer-events:none}
+.wl-inner{max-width:520px;width:92%;text-align:center;
+  padding:40px 0 40px;margin:auto}
+.wl-eyebrow{font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:14px}
+.wl-title{font-family:'Cabinet Grotesk',sans-serif;font-size:clamp(24px,6vw,38px);
+  font-weight:900;letter-spacing:-.02em;line-height:1.1;margin-bottom:10px}
+.wl-title .gold{background:linear-gradient(90deg,#f5c842,#ff9d42 50%,#f5c842);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  background-size:200%;animation:shimmer 2.5s linear infinite}
+@keyframes shimmer{to{background-position:200% center}}
+.wl-sub{font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:28px;font-weight:300}
+.wl-sub strong{color:var(--text);font-weight:500}
+.wl-roles-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:12px}
+.wl-roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+@media(max-width:400px){.wl-roles{grid-template-columns:1fr}}
+.role-card{padding:14px 16px;border-radius:12px;border:1px solid var(--border2);
+  background:rgba(255,255,255,.04);cursor:pointer;text-align:left;
+  -webkit-tap-highlight-color:transparent;
+  transition:border-color .2s,background .2s;position:relative;overflow:hidden}
+.role-card:active{background:rgba(255,255,255,.08)}
+.role-card.sel{border-color:var(--role-col,var(--core));background:rgba(255,255,255,.07)}
+.role-icon{font-size:18px;margin-bottom:6px;display:block}
+.role-name{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:13px;
+  color:var(--text);margin-bottom:3px}
+.role-desc{font-size:10px;color:var(--text-mid);line-height:1.4;font-weight:300}
+.wl-cta{width:100%;height:52px;border-radius:26px;border:none;
+  background:var(--core);color:#050608;
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:16px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:background .2s;letter-spacing:.01em;
+  -webkit-appearance:none;appearance:none}
+.wl-cta:active{background:#ffd556}
+.wl-cta:disabled{background:rgba(255,255,255,.12);color:var(--text-dim);cursor:default}
+.wl-skip{display:block;margin-top:16px;font-size:11px;color:var(--text-dim);
+  cursor:pointer;background:none;border:none;font-family:'JetBrains Mono',monospace;
+  letter-spacing:.06em;padding:10px;width:100%;text-align:center;
+  -webkit-tap-highlight-color:transparent}
+
+/* ═══ HEADER ═══════════════════════════════════════════════════════════ */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--hh);
+  display:flex;align-items:center;gap:10px;padding:0 14px;
+  background:#0a0c18;border-bottom:1px solid var(--border2)}
+.hbrand{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.hlogo{font-family:'Instrument Serif',serif;font-size:19px;font-style:italic;
+  background:linear-gradient(135deg,#f5c842,#ff9d42);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.htitle{font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase}
+.htitle em{color:var(--core);font-style:normal}
+@media(max-width:560px){.htitle{display:none}}
+.hsearch{flex:1;max-width:300px;position:relative;min-width:0}
+.hsearch input{width:100%;height:29px;padding:0 10px 0 32px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border2);
+  border-radius:20px;color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:11px;outline:none;transition:all .2s}
+.hsearch input::placeholder{color:var(--text-dim)}
+.hsearch input:focus{background:rgba(255,255,255,.1);border-color:var(--core);
+  box-shadow:0 0 0 3px rgba(245,200,66,.1)}
+.hsrch-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:.35}
+.hsrch-clr{position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text-mid);cursor:pointer;font-size:14px;
+  display:none;line-height:1;padding:2px}
+.hsrch-clr.show{display:block}
+.hright{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+.hbtn{height:28px;padding:0 10px;background:rgba(255,255,255,.06);
+  border:1px solid var(--border2);color:var(--text-mid);
+  font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.08em;
+  text-transform:uppercase;cursor:pointer;border-radius:20px;
+  white-space:nowrap;-webkit-tap-highlight-color:transparent;
+  -webkit-appearance:none;appearance:none}
+.hbtn:active{background:rgba(255,255,255,.12);color:var(--text)}
+.hbtn.on{color:#050608;font-weight:700}
+#bb.on{background:var(--core);border-color:var(--core)}
+#bw.on{background:var(--writing);border-color:var(--writing)}
+#ba.on{background:var(--process);border-color:var(--process)}
+.hbtn-guide{background:rgba(245,200,66,.12);border-color:rgba(245,200,66,.4);
+  color:var(--core);font-weight:700}
+.hbtn-guide:active{background:rgba(245,200,66,.25)}
+@media(max-width:640px){#bb,#bw,#ba{display:none}}
+
+/* ═══ GRAPH ═════════════════════════════════════════════════════════════ */
+#gc{position:fixed;inset:var(--hh) 0 var(--fh) 0;z-index:10}
+
+/* ═══ ZONE LABELS (persistent on graph) ════════════════════════════════ */
+.zone-lbl{pointer-events:none;font-family:'Cabinet Grotesk',sans-serif;
+  font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+  paint-order:stroke fill;stroke-linejoin:round}
+
+/* ═══ WALKTHROUGH PANEL ════════════════════════════════════════════════ */
+#wt{position:fixed;bottom:calc(var(--fh) + 10px);left:50%;
+  transform:translateX(-50%) translateY(20px);
+  z-index:400;
+  width:calc(100vw - 24px);max-width:520px;
+  background:#0d1020;border:1px solid var(--border2);
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.85);
+  flex-direction:column;overflow:hidden;
+  visibility:hidden;display:flex;
+  opacity:0;transition:opacity .3s ease,transform .3s ease,visibility .3s}
+#wt.show{opacity:1;transform:translateX(-50%) translateY(0);visibility:visible}
+@media(max-width:768px){
+  #wt{bottom:calc(var(--fh) + 8px);
+    max-height:55vh;overflow-y:auto}
+}
+.wt-prog{height:3px;background:rgba(255,255,255,.1);position:relative;flex-shrink:0}
+.wt-prog-fill{height:100%;background:var(--core);transition:width .5s ease;
+  border-radius:0 3px 3px 0}
+.wt-body{padding:16px 18px 0;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
+.wt-step-num{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:10px;
+  letter-spacing:.06em;color:var(--text-dim);flex-shrink:0;padding-top:2px;min-width:36px}
+.wt-content{flex:1;min-width:0}
+.wt-node-name{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:17px;
+  line-height:1.1;margin-bottom:6px}
+.wt-narration{font-size:12px;color:var(--text-mid);line-height:1.65;
+  font-weight:300;margin-bottom:12px}
+.wt-prompt-label{font-size:8px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:6px;
+  display:flex;align-items:center;gap:6px}
+.wt-prompt-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+.wt-prompt-box{background:rgba(255,255,255,.06);border:1px solid var(--border2);
+  border-radius:10px;padding:10px 12px 10px 12px;
+  padding-right:72px;
+  font-size:11px;color:var(--text);
+  line-height:1.6;font-family:'JetBrains Mono',monospace;font-weight:300;
+  margin-bottom:12px;position:relative}
+.wt-copy{position:absolute;top:8px;right:8px;
+  height:26px;padding:0 12px;border-radius:20px;border:1px solid var(--border2);
+  background:rgba(255,255,255,.08);color:var(--text-mid);
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:10px;
+  cursor:pointer;transition:all .15s;letter-spacing:.04em;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap}
+.wt-copy:active,.wt-copy.done{background:var(--skills);border-color:var(--skills);color:#050608}
+.wt-actions{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 18px 14px;gap:10px;flex-shrink:0}
+.wt-nav{display:flex;align-items:center;gap:6px}
+.wt-dots{display:flex;gap:4px;align-items:center}
+.wt-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);
+  transition:all .3s;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wt-dot.on{background:var(--core);width:18px;border-radius:3px}
+.wt-btn{height:36px;padding:0 18px;border-radius:20px;border:none;
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:12px;
+  cursor:pointer;transition:background .15s;letter-spacing:.02em;
+  -webkit-tap-highlight-color:transparent;-webkit-appearance:none}
+.wt-prev{background:rgba(255,255,255,.08);border:1px solid var(--border2);color:var(--text-mid)}
+.wt-prev:active{background:rgba(255,255,255,.14)}
+.wt-next{background:var(--core);color:#050608;min-width:90px}
+.wt-next:active{background:#ffd556}
+.wt-exit{font-size:10px;color:var(--text-dim);cursor:pointer;background:none;
+  border:none;font-family:'JetBrains Mono',monospace;padding:8px 4px;
+  -webkit-tap-highlight-color:transparent}
+.wt-try{display:flex;align-items:center;gap:7px;padding:10px 12px;border-radius:10px;
+  background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);
+  cursor:pointer;text-decoration:none;margin-bottom:12px;
+  -webkit-tap-highlight-color:transparent}
+.wt-try:active{background:rgba(245,200,66,.18)}
+.wt-try-txt{font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--core)}
+.wt-try-sub{font-size:10px;color:var(--text-mid)}
+
+/* ═══ SIDEBAR ═══════════════════════════════════════════════════════════ */
+#sb{position:fixed;top:var(--hh);right:0;bottom:var(--fh);
+  width:300px;z-index:400;
+  background:#0d1020;border-left:1px solid var(--border2);
+  transform:translateX(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);
+  display:flex;flex-direction:column;overflow:hidden}
+#sb.open{transform:translateX(0)}
+
+/* Mobile: compact bottom card — only 44% height, doesn't cover graph */
+@media(max-width:768px){
+  #sb{
+    top:auto;right:0;left:0;
+    bottom:var(--fh);
+    height:44vh;
+    max-height:380px;
+    width:100%;
+    border-left:none;
+    border-top:2px solid var(--border2);
+    transform:translateY(100%);
+    border-radius:20px 20px 0 0;
+    z-index:450;
+  }
+  #sb.open{transform:translateY(0)}
+  /* Hide "Explore next" section on mobile to keep card compact */
+  #sb .sb-sec:last-of-type,
+  #sb-next{display:none}
+}
+.sb-drag{width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;
+  margin:10px auto 0;display:none;flex-shrink:0}
+@media(max-width:768px){.sb-drag{display:block}}
+.sb-hero{padding:18px 18px 14px;border-bottom:1px solid var(--border);
+  position:relative;background:rgba(255,255,255,.02);flex-shrink:0}
+.sb-eye{display:flex;align-items:center;gap:7px;font-size:8px;
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-cat{color:var(--text-mid)}
+.sb-name{font-family:'Cabinet Grotesk',sans-serif;font-size:20px;font-weight:900;
+  line-height:1.1;letter-spacing:-.02em;padding-right:44px}
+/* Close button — minimum 44×44px touch target for Android */
+.sb-x{
+  position:absolute;top:10px;right:10px;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.1);
+  border:1px solid var(--border2);
+  color:var(--text);cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  z-index:10;
+}
+.sb-x:active{background:rgba(255,255,255,.22)}
+.sb-body{padding:12px 18px;overflow-y:auto;flex:1;
+  -webkit-overflow-scrolling:touch}
+.sb-desc{font-size:12px;line-height:1.75;color:var(--text-mid);margin-bottom:12px;font-weight:300}
+
+/* Try CTA in sidebar */
+.sb-cta{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:11px;
+  margin-bottom:16px;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);
+  cursor:pointer;text-decoration:none;transition:all .2s}
+.sb-cta:hover{background:rgba(245,200,66,.14);transform:translateY(-1px)}
+.sb-cta-ico{width:26px;height:26px;border-radius:8px;background:var(--core);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-cta-lbl{font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:11px;
+  color:var(--core);display:block;margin-bottom:2px}
+.sb-cta-sub{font-size:9px;color:var(--text-mid);display:block;line-height:1.4}
+
+/* Prompt box in sidebar */
+.sb-prompt-wrap{margin-bottom:16px}
+.sb-sec{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim);
+  margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sb-sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.sb-prompt{background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  border-radius:9px;padding:10px 12px;font-size:10px;color:var(--text);
+  line-height:1.7;font-family:'JetBrains Mono',monospace;font-weight:300;
+  position:relative;margin-bottom:6px}
+.sb-copy{display:flex;align-items:center;gap:5px;height:24px;padding:0 10px;
+  border-radius:20px;border:1px solid var(--border2);background:rgba(255,255,255,.04);
+  color:var(--text-mid);font-family:'Cabinet Grotesk',sans-serif;font-weight:700;
+  font-size:9px;cursor:pointer;transition:all .2s;letter-spacing:.04em;width:100%;justify-content:center}
+.sb-copy:hover{background:var(--core);border-color:var(--core);color:var(--bg)}
+.sb-copy.done{background:var(--skills);border-color:var(--skills);color:var(--bg)}
+
+/* Next suggestions */
+.sb-next-grid{display:flex;flex-direction:column;gap:5px}
+.sb-next-item{display:flex;align-items:center;gap:8px;padding:10px 10px;
+  border-radius:9px;border:1px solid var(--border);cursor:pointer;
+  transition:background .15s;background:rgba(255,255,255,.02);
+  -webkit-tap-highlight-color:transparent}
+.sb-next-item:active{background:rgba(255,255,255,.07)}
+.sb-next-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-next-label{font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:11px;flex:1}
+.sb-next-rel{font-size:9px;color:var(--text-dim);letter-spacing:.05em}
+.sb-next-arr{color:var(--text-dim);font-size:12px;flex-shrink:0}
+
+/* ═══ LEGEND ═════════════════════════════════════════════════════════════ */
+#leg{position:fixed;bottom:calc(var(--fh)+10px);left:12px;z-index:300;
+  background:#0d1020;border:1px solid var(--border2);
+  border-radius:13px;padding:11px 13px;
+  max-height:calc(100vh - var(--hh) - var(--fh) - 80px);overflow-y:auto;
+  scrollbar-width:none}
+#leg::-webkit-scrollbar{display:none}
+@media(max-width:768px){#leg{display:none}}
+.leg-h{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);
+  margin-bottom:9px;font-family:'Cabinet Grotesk',sans-serif;font-weight:700}
+.leg-i{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--text-mid);
+  margin-bottom:5px;cursor:pointer;transition:color .2s;
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:600}
+.leg-i:last-child{margin-bottom:0}
+.leg-i:hover{color:var(--text)}
+.leg-d{width:8px;height:8px;border-radius:3px;flex-shrink:0}
+
+/* ═══ PATHS ══════════════════════════════════════════════════════════════ */
+#paths{position:fixed;bottom:calc(var(--fh)+10px);right:12px;z-index:300;
+  width:250px;background:#0d1020;border:1px solid var(--border2);
+  border-radius:13px;padding:11px 13px;
+  transition:right .4s cubic-bezier(.16,1,.3,1)}
+#paths.shift{right:316px}
+@media(max-width:768px){#paths{display:none}}
+.paths-h{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);
+  margin-bottom:8px;font-family:'Cabinet Grotesk',sans-serif;font-weight:700}
+.prow{padding:8px 10px;border-radius:9px;border:1px solid transparent;
+  cursor:pointer;margin-bottom:5px;transition:all .22s;background:rgba(255,255,255,.02)}
+.prow:last-child{margin-bottom:0}
+.prow:hover{border-color:var(--border2);background:rgba(255,255,255,.05)}
+.prow.on{background:rgba(255,255,255,.07);border-color:var(--border2)}
+.prow-lbl{font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:3px;font-family:'Cabinet Grotesk',sans-serif;font-weight:800}
+.prow-steps{font-size:9px;color:var(--text-mid);line-height:1.55;font-weight:300}
+
+/* ═══ ZOOM ════════════════════════════════════════════════════════════════ */
+#zc{position:fixed;top:calc(var(--hh)+10px);left:12px;z-index:300;
+  display:flex;flex-direction:column;gap:4px}
+.zb{width:36px;height:36px;background:#0d1020;border:1px solid var(--border2);
+  color:var(--text-mid);cursor:pointer;border-radius:9px;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;transition:background .15s}
+.zb:active{background:rgba(255,255,255,.12);color:var(--text)}
+
+/* ═══ TOOLTIP ═══════════════════════════════════════════════════════════ */
+#tip{position:fixed;z-index:600;background:#0d1020;border:1px solid var(--border2);
+  border-radius:8px;padding:7px 13px;font-size:11px;color:var(--text);
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:700;
+  pointer-events:none;opacity:0;transition:opacity .12s;
+  white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+#tip.show{opacity:1}
+
+/* ═══ FOOTER ═════════════════════════════════════════════════════════════ */
+#footer{position:fixed;bottom:0;left:0;right:0;z-index:500;height:var(--fh);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;background:#0a0c18;border-top:1px solid var(--border2);gap:8px}
+.ft-l{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ft-by{font-size:8px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase}
+.ft-name{font-family:'Cabinet Grotesk',sans-serif;font-size:12px;font-weight:800;color:var(--text)}
+.ft-sep{width:1px;height:12px;background:var(--border2)}
+.ft-a{font-size:9px;color:var(--text-mid);text-decoration:none;
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:600;
+  padding:3px 9px;border-radius:20px;border:1px solid var(--border);transition:all .2s}
+.ft-a:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.06)}
+@media(max-width:480px){.ft-a{display:none}}
+.ft-r{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.shr{display:flex;align-items:center;gap:4px;height:24px;padding:0 10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--text-mid);cursor:pointer;border-radius:20px;
+  font-family:'Cabinet Grotesk',sans-serif;font-size:9px;font-weight:700;
+  text-decoration:none;transition:all .2s}
+.shr:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.shr.li:hover{color:#fff;background:#0a66c2;border-color:#0a66c2}
+.shr.tw:hover{color:#fff;background:#18181b;border-color:#333}
+.shr.cp:hover{color:var(--bg);background:var(--core);border-color:var(--core)}
+.shr.cp.done{color:var(--bg);background:var(--skills);border-color:var(--skills)}
+@media(max-width:480px){.shr span{display:none}}
+
+/* ═══ TOAST ══════════════════════════════════════════════════════════════ */
+#toast{position:fixed;bottom:calc(var(--fh)+10px);left:50%;transform:translateX(-50%);
+  z-index:700;background:#1a2040;border:1px solid var(--skills);
+  border-radius:20px;padding:8px 20px;font-size:11px;color:var(--skills);
+  letter-spacing:.12em;text-transform:uppercase;
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:700;
+  opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap}
+#toast.show{opacity:1}
+
+/* ═══ BACKDROP ═══════════════════════════════════════════════════════════ */
+#sbbk{position:fixed;inset:0;z-index:390;background:rgba(0,0,0,0);
+  pointer-events:none;transition:background .25s}
+#sbbk.show{background:rgba(0,0,0,.6);pointer-events:auto}
+
+/* ═══ ABOUT MODAL ════════════════════════════════════════════════════════ */
+#about-modal{
+  position:fixed;inset:0;z-index:800;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.75);
+  opacity:0;pointer-events:none;transition:opacity .25s;
+  padding:16px;
+}
+#about-modal.show{opacity:1;pointer-events:auto}
+.about-inner{
+  background:#0d1020;border:1px solid var(--border2);
+  border-radius:16px;max-width:600px;width:100%;
+  max-height:90vh;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:28px 28px 24px;
+  position:relative;
+}
+@media(max-width:480px){.about-inner{padding:20px 18px 20px;border-radius:14px}}
+.about-close{
+  position:absolute;top:12px;right:12px;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid var(--border2);
+  color:var(--text);cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.about-close:active{background:rgba(255,255,255,.18)}
+.about-eyebrow{font-size:8px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:10px}
+.about-title{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;
+  font-size:clamp(20px,4vw,28px);line-height:1.1;margin-bottom:4px}
+.about-title span{color:var(--core)}
+.about-byline{font-size:10px;color:var(--text-dim);margin-bottom:20px;letter-spacing:.06em}
+.about-byline a{color:var(--core);text-decoration:none}
+.about-divider{height:1px;background:var(--border);margin:18px 0}
+.about-section-title{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;
+  font-size:13px;color:var(--text);margin-bottom:8px;letter-spacing:.01em}
+.about-p{font-size:12px;color:var(--text-mid);line-height:1.8;margin-bottom:12px;font-weight:300}
+.about-p strong{color:var(--text);font-weight:600}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+@media(max-width:400px){.about-grid{grid-template-columns:1fr}}
+.about-card{background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  border-radius:10px;padding:12px 14px}
+.about-card-num{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;
+  font-size:22px;margin-bottom:2px}
+.about-card-label{font-size:10px;color:var(--text-mid);line-height:1.4}
+.about-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.about-cat{font-size:10px;padding:4px 10px;border-radius:20px;
+  border:1px solid;font-family:'Cabinet Grotesk',sans-serif;font-weight:600}
+.about-steps{display:flex;flex-direction:column;gap:6px}
+.about-step{display:flex;align-items:flex-start;gap:10px;padding:8px 0;
+  border-bottom:1px solid var(--border);font-size:11px;color:var(--text-mid)}
+.about-step:last-child{border-bottom:none}
+.about-step-n{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;
+  font-size:11px;color:var(--core);flex-shrink:0;width:18px}
+.about-cta{display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:20px;padding:14px;border-radius:12px;
+  background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);
+  cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.about-cta:active{background:rgba(245,200,66,.2)}
+.about-cta-txt{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;
+  font-size:13px;color:var(--core)}
+
+/* ═══ SEARCH RESULTS ════════════════════════════════════════════════════ */
+#sres{position:fixed;z-index:500;
+  display:none;max-height:280px;overflow-y:auto;
+  background:#0d1020;border:1px solid var(--border2);
+  border-radius:12px;
+  box-shadow:0 16px 48px rgba(0,0,0,.8)}
+#sres.show{display:block}
+.sri{display:flex;align-items:center;gap:11px;padding:12px 15px;cursor:pointer;
+  border-bottom:1px solid var(--border);transition:background .12s;
+  -webkit-tap-highlight-color:transparent}
+.sri:last-child{border-bottom:none}
+.sri:active,.sri.ak{background:rgba(255,255,255,.07)}
+.sri-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sri-label{font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:12px;flex:1}
+.sri-cat{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
+.sri-empty{padding:18px;color:var(--text-dim);font-size:11px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="bgc"></canvas>
+
+<!-- ═══ WELCOME SCREEN ══════════════════════════════════════════════════ -->
+<div id="welcome">
+  <div class="wl-inner">
+    <div class="wl-eyebrow">Interactive Knowledge Graph · v6</div>
+    <h1 class="wl-title">
+      How does <span class="gold">Claude</span> fit into technical writing?
+    </h1>
+    <p class="wl-sub">
+      55 concepts. 10 workflow clusters. Every node has a <strong>real prompt you can copy</strong> and use in Claude right now.<br>
+      Pick your role to get a guided walkthrough built for you.
+    </p>
+    <div class="wl-roles-label">I am a…</div>
+    <div class="wl-roles" id="wl-roles"></div>
+    <button class="wl-cta" id="wl-start" disabled>Start my guided walkthrough →</button>
+    <button class="wl-skip" id="wl-skip">Skip intro — explore freely</button>
+  </div>
+</div>
+
+<!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+<div id="hdr">
+  <div class="hbrand">
+    <div class="hlogo">C</div>
+    <div class="htitle"><em>Claude</em> for Technical Writers</div>
+  </div>
+  <div class="hsearch" id="search-wrap">
+    <svg class="hsrch-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="srch" type="text" placeholder="Search… DITA, RAG, MCP, Skills…" autocomplete="off" spellcheck="false">
+    <button class="hsrch-clr" id="srch-clr">×</button>
+  </div>
+  <div class="hright">
+    <button class="hbtn hbtn-guide" id="btng">▶ Guide</button>
+    <button class="hbtn" id="bb">Beginner</button>
+    <button class="hbtn" id="bw">Writer</button>
+    <button class="hbtn" id="ba">Advanced</button>
+    <button class="hbtn" id="br">Reset</button>
+  </div>
+</div>
+
+<!-- Search results -->
+<div id="sres"></div>
+
+<div id="gc"></div>
+<div id="zc">
+  <button class="zb" id="zi">+</button>
+  <button class="zb" id="zo">−</button>
+  <button class="zb" id="zf" style="font-size:10px">⊞</button>
+</div>
+
+<!-- Legend -->
+<div id="leg">
+  <div class="leg-h">Clusters</div>
+  <div class="leg-i" data-cat="core">  <div class="leg-d" style="background:var(--core)"></div>Core Platform</div>
+  <div class="leg-i" data-cat="model"> <div class="leg-d" style="background:var(--model)"></div>Models & AI</div>
+  <div class="leg-i" data-cat="tools"> <div class="leg-d" style="background:var(--tools)"></div>Tools & Agents</div>
+  <div class="leg-i" data-cat="skills"><div class="leg-d" style="background:var(--skills)"></div>Skills & Memory</div>
+  <div class="leg-i" data-cat="integr"><div class="leg-d" style="background:var(--integr)"></div>Integrations</div>
+  <div class="leg-i" data-cat="rag">   <div class="leg-d" style="background:var(--rag)"></div>RAG & Knowledge</div>
+  <div class="leg-i" data-cat="writing"><div class="leg-d" style="background:var(--writing)"></div>Writing Workflow</div>
+  <div class="leg-i" data-cat="output"><div class="leg-d" style="background:var(--output)"></div>Output & Formats</div>
+  <div class="leg-i" data-cat="l10n">  <div class="leg-d" style="background:var(--l10n)"></div>L10n & Terminology</div>
+  <div class="leg-i" data-cat="process"><div class="leg-d" style="background:var(--process)"></div>Process & Governance</div>
+</div>
+
+<!-- Paths -->
+<div id="paths">
+  <div class="paths-h">Learning Paths</div>
+  <div class="prow" id="pr-b">
+    <div class="prow-lbl" style="color:var(--core)">Beginner</div>
+    <div class="prow-steps">Claude → Prompting → Projects → Skills → Tools → Agents → Evaluation</div>
+  </div>
+  <div class="prow" id="pr-w">
+    <div class="prow-lbl" style="color:var(--writing)">Writer-Specific</div>
+    <div class="prow-steps">Claude → Prompting → Skills → Custom Instructions → Style Guide → Docs-as-Code → DDLC → Review & QA</div>
+  </div>
+  <div class="prow" id="pr-a">
+    <div class="prow-lbl" style="color:var(--process)">Advanced Pipeline</div>
+    <div class="prow-steps">MCP → Connectors → RAG → Knowledge Base → Agents → Sub-Agents → Governance</div>
+  </div>
+</div>
+
+<!-- Walkthrough panel -->
+<div id="wt">
+  <div class="wt-prog"><div class="wt-prog-fill" id="wt-fill"></div></div>
+  <div class="wt-body">
+    <div class="wt-step-num" id="wt-num"></div>
+    <div class="wt-content">
+      <div class="wt-node-name" id="wt-name"></div>
+      <div class="wt-narration" id="wt-narr"></div>
+      <a class="wt-try" id="wt-try" href="#" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--core)" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <div>
+          <div class="wt-try-txt">Try this in Claude →</div>
+          <div class="wt-try-sub" id="wt-try-sub"></div>
+        </div>
+      </a>
+      <div class="wt-prompt-label">Copy this prompt</div>
+      <div class="wt-prompt-box" id="wt-prompt">
+        <button class="wt-copy" id="wt-copy">Copy</button>
+        <span id="wt-prompt-text"></span>
+      </div>
+    </div>
+  </div>
+  <div class="wt-actions">
+    <button class="wt-exit" id="wt-exit">✕ Exit guide</button>
+    <div class="wt-nav">
+      <button class="wt-btn wt-prev" id="wt-prev">← Prev</button>
+      <div class="wt-dots" id="wt-dots"></div>
+      <button class="wt-btn wt-next" id="wt-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div id="sbbk"></div>
+<div id="sb">
+  <div class="sb-drag"></div>
+  <button class="sb-x" id="sb-x">✕</button>
+  <div class="sb-hero">
+    <div class="sb-eye">
+      <div class="sb-dot" id="sb-dot"></div>
+      <span class="sb-cat" id="sb-cat"></span>
+    </div>
+    <div class="sb-name" id="sb-name"></div>
+  </div>
+  <div class="sb-body">
+    <div class="sb-desc" id="sb-desc"></div>
+    <a class="sb-cta" id="sb-cta" href="#" target="_blank" rel="noopener">
+      <div class="sb-cta-ico">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#050608" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </div>
+      <div>
+        <span class="sb-cta-lbl">Try this in Claude</span>
+        <span class="sb-cta-sub" id="sb-cta-sub"></span>
+      </div>
+    </a>
+    <div class="sb-prompt-wrap">
+      <div class="sb-sec">Prompt to copy</div>
+      <div class="sb-prompt" id="sb-prompt"></div>
+      <button class="sb-copy" id="sb-copy">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        <span id="sb-copy-lbl">Copy prompt</span>
+      </button>
+    </div>
+    <div class="sb-sec">Explore next</div>
+    <div class="sb-next-grid" id="sb-next"></div>
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<!-- About Modal -->
+<div id="about-modal">
+  <div class="about-inner">
+    <button class="about-close" id="about-close">✕</button>
+    <div class="about-eyebrow">Interactive Learning Tool · Built by Kamal Raj</div>
+    <h2 class="about-title"><span>Claude</span> for Technical Writers</h2>
+    <div class="about-byline">
+      By <a href="https://kamalraj21.github.io/contentcraft/" target="_blank" rel="noopener">Kamal Raj</a>
+      · Staff Technical Writer · AI Documentation Consultant
+      · <a href="https://www.linkedin.com/in/kamalraj21/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">What is this?</div>
+    <div class="about-p">
+      This is an <strong>interactive knowledge graph</strong> that maps every major Claude concept, tool, and workflow relevant to technical writers — and shows how they connect to each other. It was built as a learning resource to answer one question: <strong>where exactly does Claude fit into a technical writing workflow?</strong>
+    </div>
+    <div class="about-p">
+      Most AI guides for writers are blog posts or slide decks. This is different — it's a living, explorable map that you navigate at your own pace, with copyable prompts at every node so learning immediately translates into action.
+    </div>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-num" style="color:var(--core)">55</div>
+        <div class="about-card-label">Concepts mapped across the full Claude ecosystem</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-num" style="color:var(--tools)">10</div>
+        <div class="about-card-label">Workflow clusters from core platform to governance</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-num" style="color:var(--writing)">3</div>
+        <div class="about-card-label">Guided learning paths for different roles and goals</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-num" style="color:var(--skills)">55</div>
+        <div class="about-card-label">Copyable prompts — one per node, ready to use now</div>
+      </div>
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">The 10 clusters</div>
+    <div class="about-cats">
+      <div class="about-cat" style="color:var(--core);border-color:var(--core)">Core Platform</div>
+      <div class="about-cat" style="color:var(--model);border-color:var(--model)">Models & AI</div>
+      <div class="about-cat" style="color:var(--tools);border-color:var(--tools)">Tools & Agents</div>
+      <div class="about-cat" style="color:var(--skills);border-color:var(--skills)">Skills & Memory</div>
+      <div class="about-cat" style="color:var(--integr);border-color:var(--integr)">Integrations</div>
+      <div class="about-cat" style="color:var(--rag);border-color:var(--rag)">RAG & Knowledge</div>
+      <div class="about-cat" style="color:var(--writing);border-color:var(--writing)">Writing Workflow</div>
+      <div class="about-cat" style="color:var(--output);border-color:var(--output)">Output & Formats</div>
+      <div class="about-cat" style="color:var(--l10n);border-color:var(--l10n)">L10n & Terminology</div>
+      <div class="about-cat" style="color:var(--process);border-color:var(--process)">Process & Governance</div>
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">How to use it</div>
+    <div class="about-steps">
+      <div class="about-step"><div class="about-step-n">1</div><div>Tap <strong style="color:var(--text)">▶ Guide</strong> and pick your role — New to Claude, Technical Writer, Docs Lead, or Developer. You'll get a walkthrough built for you.</div></div>
+      <div class="about-step"><div class="about-step-n">2</div><div>The guide moves the camera node-by-node. Each stop has a <strong style="color:var(--text)">narration</strong> explaining why this concept matters, and a <strong style="color:var(--text)">prompt you can copy</strong> and use in Claude immediately.</div></div>
+      <div class="about-step"><div class="about-step-n">3</div><div>Tap any node to explore freely. The panel shows what it is, how it connects to other nodes, and a direct link to try it in Claude.</div></div>
+      <div class="about-step"><div class="about-step-n">4</div><div>Use the <strong style="color:var(--text)">search bar</strong> to jump to any concept instantly. Use the <strong style="color:var(--text)">cluster legend</strong> on the left to isolate a category and fly the camera to it.</div></div>
+      <div class="about-step"><div class="about-step-n">5</div><div>The <strong style="color:var(--text)">three learning paths</strong> (Beginner, Writer-Specific, Advanced) highlight a sequence of nodes as a suggested learning order.</div></div>
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="about-section-title">Why it was built</div>
+    <div class="about-p">
+      Technical writers are among the professionals with the most to gain from Claude — and often among the last to adopt it systematically. Most AI education focuses on developers. This graph was built to change that: to give writers a <strong>complete, honest map</strong> of what Claude can do in their specific workflow, from first draft to DITA XML to L10n to CI/CD pipelines.
+    </div>
+    <div class="about-p">
+      Every node represents a real capability gap that writers face. Every prompt was written to be immediately useful — not generic, but specific to the documentation context a technical writer would actually be working in.
+    </div>
+
+    <a class="about-cta" href="https://claude.ai" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--core)" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      <span class="about-cta-txt">Open Claude and start exploring →</span>
+    </a>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="footer">
+  <div class="ft-l">
+    <span class="ft-by">By</span>
+    <span class="ft-name">Kamal Raj</span>
+    <div class="ft-sep"></div>
+    <a class="ft-a" href="https://kamalraj21.github.io/contentcraft/" target="_blank" rel="noopener">Portfolio</a>
+    <a class="ft-a" href="https://www.linkedin.com/in/kamalraj21/" target="_blank" rel="noopener">LinkedIn</a>
+    <button class="ft-a" id="btn-about" style="cursor:pointer;background:none;border:1px solid var(--border)">About</button>
+  </div>
+  <div class="ft-r">
+    <button class="shr li" id="shr-li">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      <span>LinkedIn</span>
+    </button>
+    <button class="shr tw" id="shr-tw">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <span>Post on X</span>
+    </button>
+    <button class="shr cp" id="shr-cp">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      <span id="cplbl">Copy link</span>
+    </button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('bgc'),x=c.getContext('2d');
+  let w,h; const pts=[];
+  const resize=()=>{w=c.width=innerWidth;h=c.height=innerHeight};
+  resize(); window.addEventListener('resize',resize);
+  for(let i=0;i<48;i++) pts.push({x:Math.random()*2200-500,y:Math.random()*1300-200,
+    vx:(Math.random()-.5)*.14,vy:(Math.random()-.5)*.09,r:Math.random()*1.4+.3,
+    hue:[52,210,170,126,36,280,350,163,25,265][i%10],a:Math.random()*.28+.04});
+  (function frame(){
+    x.clearRect(0,0,w,h);
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;
+      if(p.x<-500)p.x=w+50;if(p.x>w+500)p.x=-50;
+      if(p.y<-200)p.y=h+50;if(p.y>h+200)p.y=-50;
+      x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);
+      x.fillStyle=`hsla(${p.hue},76%,62%,${p.a})`;x.fill()});
+    requestAnimationFrame(frame)})();
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════
+const CC={core:'--core',model:'--model',tools:'--tools',skills:'--skills',
+  integr:'--integr',rag:'--rag',writing:'--writing',output:'--output',l10n:'--l10n',process:'--process'};
+const cv=cat=>getComputedStyle(document.documentElement).getPropertyValue(CC[cat]).trim();
+const CL={core:'Core Platform',model:'Models & AI',tools:'Tools & Agents',skills:'Skills & Memory',
+  integr:'Integrations',rag:'RAG & Knowledge',writing:'Writing Workflow',output:'Output & Formats',
+  l10n:'Localisation & Terminology',process:'Process & Governance'};
+const CLUSTER={core:[.50,.46],model:[.50,.16],tools:[.20,.40],skills:[.28,.68],integr:[.18,.21],
+  rag:[.74,.26],writing:[.72,.60],output:[.50,.78],l10n:[.82,.43],process:[.30,.86]};
+
+// ROLES → walkthrough sequences
+const ROLES=[
+  {id:'new',icon:'✍️',name:'New to Claude',desc:'Never used Claude for writing before',
+   color:'var(--core)',
+   steps:['claude','prompting','projects','skills','tools','review','evaluation']},
+  {id:'writer',icon:'📝',name:'Technical Writer',desc:'Daily writer — docs, guides, API references',
+   color:'var(--writing)',
+   steps:['claude','prompting','skills','custinstr','styleguide','docsascode','ddlc','review']},
+  {id:'lead',icon:'🏗️',name:'Docs Lead / Manager',desc:'Running a team or doc system',
+   color:'var(--process)',
+   steps:['claude','agents','mcp','rag','knowledgebase','cicd','governance','evaluation']},
+  {id:'engineer',icon:'⚙️',name:'Developer / TW Engineer',desc:'Building doc pipelines and automation',
+   color:'var(--tools)',
+   steps:['claude','api','claudecode','mcp','connectors','rag','cicd','docsascode']},
+];
+
+// Nodes with narration (walkthrough-specific text) and next suggestions
+const ND=[
+  {id:'claude',label:'Claude',cat:'core',sz:54,
+   desc:'Anthropic\'s AI assistant — the hub of every workflow in this graph. Every tool, concept, and integration connects back here.',
+   narr:'This is Claude — the centre of the entire graph. Everything radiates outward from here. Think of it as the engine: all the nodes you\'ll explore are either things Claude does, things it connects to, or things that make it smarter.',
+   prompt:'I\'m a technical writer. Give me 5 concrete things I can do with Claude this week to improve my documentation workflow.',
+   next:['prompting','tools','projects','skills']},
+  {id:'prompting',label:'Prompting',cat:'core',sz:40,
+   desc:'The art of giving Claude effective instructions. Zero-shot, few-shot, chain-of-thought, role prompts. The highest-leverage skill for any writer.',
+   narr:'Before you touch any other node, master this one. Prompting is the difference between Claude giving you a mediocre draft and giving you something you\'d actually publish. It costs nothing to learn and changes everything.',
+   prompt:'Act as a senior technical writer. Review this instruction and tell me how to make it more effective: "Write a how-to guide for setting up our API." What\'s wrong with it and what should I say instead?',
+   next:['skills','personas','promptlib','context']},
+  {id:'projects',label:'Projects',cat:'core',sz:34,
+   desc:'Persistent Claude.ai workspaces that hold your context, files, and custom instructions across sessions.',
+   narr:'A Project is like a dedicated workspace for a doc project. You upload your style guide, set instructions once, and every conversation in that project follows your rules. No more re-explaining yourself every session.',
+   prompt:'I\'m setting up a Claude Project for API documentation. Draft the system instructions I should paste in. Include: audience level, output format preference, tone, and terminology rules I should define.',
+   next:['skills','custinstr','memory','knowledgebase']},
+  {id:'skills',label:'Skills',cat:'skills',sz:42,
+   desc:'Custom instruction files uploaded to Claude Projects. A skill teaches Claude exactly how to behave for a specific doc task.',
+   narr:'A Skill is a text file that gives Claude a job description. You write "When I ask you to review docs, always check for: passive voice, jargon, broken structure." Upload it once. It runs on every conversation in that Project.',
+   prompt:'Write me a skill file for Claude that turns it into a technical editor. It should check for: passive voice, undefined acronyms, inconsistent terminology, and unclear steps in procedures.',
+   next:['custinstr','promptlib','styleguide','memory']},
+  {id:'custinstr',label:'Custom Instructions',cat:'skills',sz:30,
+   desc:'Project-level settings that shape every response: tone, format, audience level, terminology rules.',
+   narr:'Custom Instructions are the first thing Claude reads before your message. If you\'ve been getting generic output, this is why — Claude doesn\'t know your audience, your brand voice, or your format preferences unless you tell it here.',
+   prompt:'I write API documentation for enterprise developers. Write the custom instructions I should add to my Claude Project so every response uses the right tone, format, and technical depth without me asking.',
+   next:['styleguide','personas','projects','prompting']},
+  {id:'styleguide',label:'Style Guide',cat:'writing',sz:34,
+   desc:'Upload your style guide to a Project. Claude enforces it on every output — Microsoft Style Guide, Google Dev Docs, or your own.',
+   narr:'Most writers re-explain their style guide in every prompt. Instead, upload it once to your Project. Now every draft Claude writes already follows your house style — actively, not just when reminded.',
+   prompt:'I\'m going to paste my 10 most important style rules. Once I do, rewrite this paragraph following them exactly, then explain which rules you applied: [PASTE YOUR RULES AND PARAGRAPH]',
+   next:['review','terminology','ddlc','docsascode']},
+  {id:'tools',label:'Tools',cat:'tools',sz:44,
+   desc:'Claude\'s built-in capabilities: web search, file reading, code execution, image analysis. Each one expands what Claude can do inside a conversation.',
+   narr:'Tools are superpowers you can switch on. Web search means Claude can check if your API docs are still accurate against the live product. File reading means you can upload a 200-page spec and ask Claude to summarise it. Code execution means Claude can actually run the scripts in your tutorials.',
+   prompt:'I\'m writing a tutorial that includes a code example. I\'ll paste the code here. Run it, tell me if it works, then write a step-by-step explanation of what it does that a beginner developer could follow.',
+   next:['mcp','websearch','codeexec','files']},
+  {id:'mcp',label:'MCP',cat:'tools',sz:40,
+   desc:'Model Context Protocol — the open standard connecting Claude to external systems like GitHub, Notion, Confluence, and your own tools.',
+   narr:'MCP is the reason Claude can reach outside the conversation. Without it, Claude only knows what you paste in. With MCP, Claude can read your GitHub repo, your Notion wiki, your Confluence site — and act on them.',
+   prompt:'Explain the Model Context Protocol to me as a technical writer who understands webhooks and APIs but hasn\'t used MCP yet. What does it unlock for documentation specifically?',
+   next:['connectors','claudecode','github','rag']},
+  {id:'connectors',label:'Connectors',cat:'tools',sz:34,
+   desc:'Pre-built MCP integrations in Claude.ai: Google Drive, Gmail, Google Calendar. Claude reads your actual files without copy-pasting.',
+   narr:'Connectors are MCP with the setup already done for you. Enable Google Drive in Claude.ai settings and Claude can read any file in your Drive. No API keys. No configuration. Just "read my spec document and tell me what\'s missing."',
+   prompt:'I\'ve connected Google Drive to Claude. I have a product spec doc in my Drive called [FILENAME]. Summarise it, then list every documentation task it implies I need to do.',
+   next:['gdrive','googledocs','slack','mcp']},
+  {id:'agents',label:'Agents',cat:'tools',sz:44,
+   desc:'Claude running autonomously over multi-step tasks — planning, executing, adjusting. The key to documentation at scale.',
+   narr:'An Agent isn\'t just Claude answering a question. It\'s Claude making a plan and executing it across multiple steps without you driving each one. Tell it to audit your entire docs site. It will. Tell it to generate a full API reference from your OpenAPI spec. It will do that too.',
+   prompt:'Design a documentation agent for me. It should: (1) read a GitHub repo, (2) identify undocumented functions, (3) draft documentation stubs for each one. What would the instructions and workflow look like?',
+   next:['subagents','claudecode','cicd','rag']},
+  {id:'claudecode',label:'Claude Code',cat:'tools',sz:34,
+   desc:'Claude\'s CLI tool. Technical writers use it to automate doc builds, lint Markdown, run CI scripts, and work directly with Git.',
+   narr:'Claude Code brings Claude into your terminal. For technical writers who work with Docs-as-Code, this is transformative — you can run "claude fix all broken links in /docs" or "claude generate a changelog from the last 30 commits" from the command line.',
+   prompt:'I\'m a technical writer using a MkDocs site with GitHub. What are the 5 most useful things I can do with Claude Code for my documentation workflow? Give me the actual commands.',
+   next:['docsascode','cicd','github','markdown']},
+  {id:'rag',label:'RAG',cat:'rag',sz:42,
+   desc:'Retrieval-Augmented Generation — feeding Claude your own docs as context so answers are grounded in your actual content.',
+   narr:'RAG solves Claude\'s biggest weakness: it doesn\'t know your product. With RAG, before Claude answers, it searches your documentation, finds the relevant sections, and includes them in its context. Now Claude answers about YOUR product, not a generic one.',
+   prompt:'I want to build a RAG system so Claude can answer questions using my product documentation. Walk me through the simplest possible setup — what do I need, what are the steps, and what does the result look like for a user?',
+   next:['knowledgebase','embeddings','docingest','agents']},
+  {id:'knowledgebase',label:'Knowledge Base',cat:'rag',sz:36,
+   desc:'Your curated docs, style guides, and reference material — the foundation of accurate, on-brand generation.',
+   narr:'A Knowledge Base is the library Claude draws from when you use RAG. Think of it as Claude\'s long-term memory about your product. The better you curate it — clear structure, up-to-date content, good metadata — the better Claude\'s outputs will be.',
+   prompt:'I need to build a knowledge base for my product documentation so Claude can use it accurately. What should I include, how should I structure it, and what makes a knowledge base high-quality for AI use?',
+   next:['rag','docingest','projects','terminology']},
+  {id:'docsascode',label:'Docs-as-Code',cat:'writing',sz:48,
+   desc:'Treating docs like software: Git, Markdown/DITA, CI/CD, peer review via PRs. Claude fits at every point.',
+   narr:'Docs-as-Code means your documentation lives in Git, gets reviewed like code, and ships through a build pipeline. Claude integrates here at every stage — drafting, reviewing PRs, linting Markdown, generating changelogs. It\'s the natural habitat for technical writing automation.',
+   prompt:'My team is moving to Docs-as-Code with MkDocs and GitHub. Map out exactly where Claude can help in our workflow — from writing to review to publishing. Give me a concrete integration plan.',
+   next:['ddlc','claudecode','cicd','markdown']},
+  {id:'ddlc',label:'DDLC',cat:'writing',sz:44,
+   desc:'Documentation Development Lifecycle — planning, drafting, reviewing, publishing, maintaining. Claude assists at every stage.',
+   narr:'DDLC is the full lifecycle of a doc: someone decides it needs to exist, someone writes it, someone reviews it, it ships, and eventually it needs updating. Claude has a role at every one of these stages — and most writers only use it at the drafting stage, which is leaving most of the value on the table.',
+   prompt:'Map out the Documentation Development Lifecycle for a new API guide. For each stage — planning, drafting, review, publish, maintain — give me a specific Claude prompt I can use right now.',
+   next:['review','styleguide','srchars','docsascode']},
+  {id:'review',label:'Review & QA',cat:'writing',sz:34,
+   desc:'Claude as your documentation reviewer: consistency, accuracy, readability, WCAG compliance, style checks.',
+   narr:'Most people use Claude to write first drafts. But it\'s equally powerful as a reviewer. Give it your style guide, give it a doc, ask it to check for consistency, jargon, passive voice, broken step sequences. It\'s faster than a human reviewer and available at 2am.',
+   prompt:'You are a senior technical editor. Review this documentation excerpt for: (1) passive voice, (2) undefined acronyms, (3) unclear steps, (4) inconsistency with the heading "Proceed carefully". Rewrite anything that fails.\n\n[PASTE YOUR DOC EXCERPT]',
+   next:['evaluation','accessibility','styleguide','contentaudit']},
+  {id:'evaluation',label:'Evaluation',cat:'process',sz:34,
+   desc:'Measuring Claude\'s output quality — accuracy, tone match, completeness, style compliance. The foundation of trustable AI docs.',
+   narr:'If you\'re using Claude to generate documentation, you need to know when it\'s good enough to publish. Evaluation is the discipline of measuring that. Without it, you\'re guessing. With it, you can actually scale AI-assisted writing with confidence.',
+   prompt:'I\'m using Claude to help write documentation. Design a simple evaluation checklist I should run on every AI-generated doc before publishing. Include checks for accuracy, tone, completeness, and style.',
+   next:['governance','cicd','review','agents']},
+  {id:'governance',label:'Governance & Risk',cat:'process',sz:38,
+   desc:'Responsible AI in docs: IP ownership, hallucination risk, editorial oversight, privacy, compliance, accessibility.',
+   narr:'Before you ship AI-generated documentation, your organisation probably needs to answer some questions: Who owns the content? What happens when Claude is wrong? Who reviews before publishing? These aren\'t hypothetical — they\'re the questions that stop AI adoption. Getting ahead of them puts you in the driver\'s seat.',
+   prompt:'I\'m introducing Claude into our documentation workflow. What governance policies do I need to put in place? Give me a one-page policy document I can present to my manager covering: AI use approval, hallucination risk, review requirements, and content ownership.',
+   next:['evaluation','cicd','accessibility','review']},
+  {id:'api',label:'API Access',cat:'core',sz:28,
+   desc:'Direct programmatic access to Claude for building doc automation scripts, custom review pipelines, and CI/CD tools.',
+   narr:'The API is Claude without the chat interface — raw, programmable, and powerful. For technical writers who can code or who work with engineers, the API is how you build custom tools: a doc quality checker that runs on every PR, a changelog generator that fires on every release, a style guide enforcer that integrates into your CMS.',
+   prompt:'I want to use the Claude API to build a documentation quality checker that runs automatically. What would the architecture look like, what API calls would I need, and what should it check for?',
+   next:['agents','claudecode','cicd','rag']},
+  {id:'models',label:'Models',cat:'model',sz:36,
+   desc:'Haiku (fast/cheap), Sonnet (balanced), Opus (most capable). Right model = right cost and quality.',
+   narr:'Not every doc task needs the same model. Bulk terminology checks? Use Haiku — fast and cheap. Daily writing and editing? Sonnet is your workhorse. Complex restructuring or sensitive content review? That\'s Opus territory. Choosing right saves cost and time.',
+   prompt:'Help me decide which Claude model to use for each of these tasks: (1) checking 500 docs for style violations, (2) writing a new conceptual overview, (3) restructuring an entire developer guide. Explain the tradeoffs.',
+   next:['haiku','sonnet','opus','evaluation']},
+  {id:'haiku',label:'Haiku',cat:'model',sz:26,
+   desc:'Fastest, cheapest model. Best for bulk processing, quick checks, and high-volume automation.',
+   narr:'Haiku is Claude\'s speed tier. Use it when you need to process a lot of content quickly and don\'t need deep reasoning. Perfect for: running a style check across 200 docs, generating quick summaries, or extracting metadata at scale.',
+   prompt:'I need to check 50 documentation files for passive voice and undefined acronyms. Write me a prompt template I can use with Claude Haiku to do this efficiently at scale.',
+   next:['sonnet','models','evaluation','agents']},
+  {id:'sonnet',label:'Sonnet',cat:'model',sz:28,
+   desc:'The balanced daily-driver. Strong reasoning, good tone control, fast enough for interactive use.',
+   narr:'Sonnet is what you\'ll use most days. It\'s the sweet spot between capability and speed. Excellent for drafting, editing, reviewing, and most interactive doc work. When in doubt, start here.',
+   prompt:'I\'m writing an API reference for a payment processing endpoint. Using your best technical writing, draft a complete reference entry including: description, parameters table, request example, response example, and error codes.',
+   next:['opus','models','prompting','review']},
+  {id:'opus',label:'Opus',cat:'model',sz:26,
+   desc:'Most capable. Use for complex restructuring, nuanced audience analysis, and high-stakes review.',
+   narr:'Opus is for hard problems. When you\'re restructuring an entire doc site, doing a deep audience analysis, or reviewing high-stakes content before a major release — that\'s Opus territory. Slower and costs more, but the reasoning quality is noticeably better.',
+   prompt:'I need to restructure our developer documentation from a task-based to an audience-based architecture. Analyse this table of contents and propose a new structure with clear reasoning for each change:\n\n[PASTE YOUR TOC]',
+   next:['sonnet','models','evaluation','governance']},
+  {id:'websearch',label:'Web Search',cat:'tools',sz:26,
+   desc:'Claude searches the web in real time — critical for keeping docs accurate against live products and standards.',
+   narr:'Documentation goes stale fast. Claude\'s web search means you can ask "Is this API endpoint still the current syntax?" or "What\'s the latest version of this library?" and get an answer grounded in live data, not Claude\'s training cutoff.',
+   prompt:'Search for the current version and breaking changes in [TOOL/LIBRARY NAME], then review this code example from my documentation and tell me if it still works or needs updating.',
+   next:['tools','files','review','knowledgebase']},
+  {id:'codeexec',label:'Code Execution',cat:'tools',sz:26,
+   desc:'Claude runs code in the conversation — useful for validating tutorial scripts and processing doc inventories.',
+   narr:'Code examples in docs that don\'t work are a developer\'s worst nightmare. With code execution, you can paste the code from your tutorial directly into Claude and ask it to run it. If it breaks, Claude tells you why and how to fix it before your readers discover it.',
+   prompt:'Here is a code example from my tutorial. Run it and tell me: (1) does it work, (2) what does each step do in plain English, (3) what error messages might a reader see and how should I explain them?\n\n[PASTE CODE]',
+   next:['tools','review','markdown','docsascode']},
+  {id:'files',label:'Files & Docs',cat:'tools',sz:26,
+   desc:'Claude reads PDFs, Word, Markdown, code files. Foundation for doc review, migration, and RAG.',
+   narr:'You don\'t have to retype your existing documentation into Claude. Upload it. Claude can read your PDFs, Word docs, Markdown files, and code. This is the starting point for doc reviews, migrations, and building your knowledge base.',
+   prompt:'I\'m going to upload my existing API documentation PDF. Once you\'ve read it: (1) summarise the gaps you notice, (2) identify any outdated patterns, (3) list the top 5 improvements you\'d recommend.',
+   next:['rag','review','docingest','knowledgebase']},
+  {id:'memory',label:'Memory',cat:'skills',sz:34,
+   desc:'Claude remembers context across conversations — your preferences, project details, terminology.',
+   narr:'Memory means you don\'t start from zero every time you open Claude. It remembers your name, your project context, your preferences. For writers who use Claude daily, this is the difference between a tool that knows you and one that forgets you overnight.',
+   prompt:'What does Claude currently remember about me and my work? Review my memory and tell me what\'s there, then suggest what else I should ask it to remember to make our documentation sessions more efficient.',
+   next:['projects','custinstr','skills','prompting']},
+  {id:'promptlib',label:'Prompt Library',cat:'skills',sz:28,
+   desc:'A reusable collection of prompts for recurring doc tasks — release notes, API stubs, UX copy review.',
+   narr:'Every technical writer has recurring tasks they do every sprint. Release notes. API stubs. Review checklists. Instead of writing a new prompt each time, build a library of prompts that you\'ve refined and know work well. Share it with your team.',
+   prompt:'Build me a starter prompt library for technical writing. Give me 6 production-ready prompts for: (1) API endpoint documentation, (2) release notes, (3) how-to guides, (4) error message writing, (5) doc review, (6) terminology checks.',
+   next:['skills','custinstr','personas','prompting']},
+  {id:'personas',label:'Personas & Roles',cat:'skills',sz:26,
+   desc:'Assigning Claude a role sharpens its output dramatically. "Act as a DITA architect" changes everything.',
+   narr:'The same question asked without a persona and with one gets completely different answers. "Review this doc" gets a generic response. "You are a senior technical editor specialising in API documentation. Review this doc for a developer audience." gets something publishable.',
+   prompt:'I\'m going to give you 3 different personas. For each one, show me how you\'d start a documentation review differently:\n1. Senior technical writer at a startup\n2. DITA architect at an enterprise\n3. Developer advocate at an API company',
+   next:['prompting','skills','custinstr','review']},
+  {id:'github',label:'GitHub',cat:'integr',sz:30,
+   desc:'Via MCP or Claude Code: read repos, review PRs, generate changelogs, keep docs in sync with code.',
+   narr:'GitHub is where Docs-as-Code lives. When Claude connects to your repo, it can read your docs alongside your code, review documentation PRs with the same rigour as code reviews, and generate changelogs directly from commit history — automatically.',
+   prompt:'I want Claude to review documentation pull requests in my GitHub repo. Write the review checklist it should follow and the prompt I\'d put in a GitHub Action to trigger it automatically.',
+   next:['docsascode','cicd','versioning','claudecode']},
+  {id:'notion',label:'Notion',cat:'integr',sz:28,
+   desc:'Connect Claude to Notion — read specs, update wikis, sync content without leaving your workflow.',
+   narr:'Many teams use Notion as their documentation source of truth. With MCP, Claude can read your Notion pages, understand your content structure, and help you improve or migrate content without exporting anything.',
+   prompt:'My team\'s product specs live in Notion. I want Claude to read a spec page and generate a documentation task list from it. What would the workflow look like and what should the prompt say?',
+   next:['knowledgebase','mcp','projects','confluence']},
+  {id:'confluence',label:'Confluence',cat:'integr',sz:28,
+   desc:'Claude reads Confluence via MCP, audits content, suggests updates, helps migrate to modern platforms.',
+   narr:'Lots of teams have years of documentation in Confluence — some of it outdated, duplicated, or badly structured. Claude can read your Confluence pages and give you an honest audit: what\'s stale, what\'s redundant, what\'s missing.',
+   prompt:'I need to migrate our Confluence documentation to MkDocs. What is the step-by-step process, and at each step, where can Claude help me the most? Be specific about the prompts I\'d use.',
+   next:['docsascode','contentaudit','mcp','rag']},
+  {id:'googledocs',label:'Google Docs',cat:'integr',sz:28,
+   desc:'Via Google Drive connector: Claude reads Docs, extracts requirements, maintains consistency across collaborative writing.',
+   narr:'Google Docs is where a lot of first-draft writing happens — specs, briefs, meeting notes. When Claude connects to your Drive, it can read these documents and help you turn them into structured documentation without copy-pasting anything.',
+   prompt:'I have a product requirements doc in Google Docs. Once I share it, I want Claude to: (1) identify all features that need documentation, (2) draft a documentation plan, (3) create stubs for each doc task.',
+   next:['gdrive','files','review','projects']},
+  {id:'gdrive',label:'Google Drive',cat:'integr',sz:26,
+   desc:'The Google Drive connector gives Claude direct access to your files for analysis and summarisation.',
+   narr:'Connect Google Drive in Claude.ai settings and Claude can access any file in your Drive. No uploading, no copying. You just say "read my Q3 release notes doc" and it does.',
+   prompt:'I\'ve connected my Google Drive. What are the most useful things I can ask Claude to do with files in my Drive for documentation work? Give me 5 specific examples with the actual prompts.',
+   next:['googledocs','connectors','files','mcp']},
+  {id:'slack',label:'Slack',cat:'integr',sz:24,
+   desc:'Surface doc decisions from Slack channels, draft release comms, keep writing context-aware.',
+   narr:'Decisions about your product get made in Slack, not in your docs. With Claude connected to Slack, you can ask it to extract decisions from a product channel, summarise what changed in last week\'s discussion, or draft the announcement message for a doc release.',
+   prompt:'I want to use Claude to extract documentation requirements from our product Slack channel. Write the prompt I\'d use to: search the last 30 days of #product-updates, identify every feature or change mentioned, and output a prioritised documentation task list.',
+   next:['projects','mcp','connectors','agents']},
+  {id:'vscode',label:'VS Code / Cursor',cat:'integr',sz:26,
+   desc:'Claude in your editor — write, review, refactor docs in the same environment as your codebase.',
+   narr:'If you work in a Docs-as-Code setup, your documentation and your code are in the same repo. Claude in VS Code or Cursor means you never have to leave your editor. Write, edit, and review docs with the same AI that can also read the code the docs describe.',
+   prompt:'I\'m a technical writer working in VS Code with a MkDocs site. What Claude features should I set up in my editor? Give me specific extensions or configuration and what I\'d use each for.',
+   next:['docsascode','claudecode','markdown','github']},
+  {id:'embeddings',label:'Embeddings',cat:'rag',sz:26,
+   desc:'Vector representations of your content that power semantic search and RAG retrieval.',
+   narr:'Embeddings are how RAG knows which part of your docs to pull into context. Each chunk of your documentation gets converted into a vector — a mathematical fingerprint. When you ask a question, the vectors are compared to find the closest match. It\'s why RAG retrieves by meaning, not by keyword.',
+   prompt:'Explain embeddings to me as a technical writer building a RAG system. I understand the concept of search — now explain specifically how embeddings make search smarter, and what I should know to make my documentation embed well.',
+   next:['rag','semantic','knowledgebase','docingest']},
+  {id:'semantic',label:'Semantic Search',cat:'rag',sz:26,
+   desc:'Finding content by meaning, not keywords. Surfaces the right doc section even when words don\'t match.',
+   narr:'Keyword search finds the word. Semantic search finds the idea. When a user searches "how do I cancel my account" and your docs say "account termination process," keyword search finds nothing. Semantic search finds it immediately.',
+   prompt:'My documentation site uses keyword search and readers keep saying they can\'t find things. Explain semantic search in terms I can use to justify upgrading, and what steps would be involved in implementing it for a MkDocs site.',
+   next:['embeddings','rag','knowledgebase','review']},
+  {id:'docingest',label:'Doc Ingestion',cat:'rag',sz:24,
+   desc:'Feeding existing documentation into Claude — via upload, API, or pipeline. The first step for any RAG system.',
+   narr:'Before Claude can search your docs, your docs need to be in a format it can search. Doc ingestion is the process of taking your existing documentation, chunking it sensibly, converting it to embeddings, and storing it somewhere Claude can query. The quality of this step directly determines the quality of your RAG system.',
+   prompt:'Walk me through the doc ingestion process for a RAG system step by step. I have 200 Markdown files in a GitHub repo. What format should they be in, how should they be chunked, and what tools could I use?',
+   next:['rag','embeddings','knowledgebase','files']},
+  {id:'markdown',label:'Markdown',cat:'output',sz:30,
+   desc:'Claude\'s native output format — perfect for Docs-as-Code, MkDocs, Docusaurus, Jekyll, GitHub.',
+   narr:'Claude thinks in Markdown. When you ask it to write documentation, it naturally produces well-structured Markdown — headings, code blocks, tables, links. For Docs-as-Code workflows, this output goes straight into your repo with minimal editing.',
+   prompt:'Write a complete Markdown document for a REST API endpoint. Include: a title, short description, endpoint URL, authentication section, request parameters table, example request, example response, and error codes table.',
+   next:['docsascode','dita','templates','changelogs']},
+  {id:'dita',label:'DITA / XML',cat:'output',sz:28,
+   desc:'Claude generates DITA-compliant topics — concept, task, reference. A powerful structured authoring accelerator.',
+   narr:'If your organisation uses DITA, Claude is a remarkably capable authoring assistant. It understands the topic types, the element hierarchy, and the writing conventions. You can give it raw information and ask for a DITA task topic, and what it returns is valid XML you can paste into your authoring tool.',
+   prompt:'Generate a DITA task topic for this procedure: installing our command-line tool on macOS. Include: taskbody, context, steps, result, and postreq elements. Use proper DITA XML formatting.',
+   next:['markdown','templates','terminology','docsascode']},
+  {id:'html',label:'HTML / Web',cat:'output',sz:26,
+   desc:'Direct HTML output for web docs, interactive examples, and custom components. Claude Code generates full static pages.',
+   narr:'For teams publishing directly to the web, Claude can generate clean HTML documentation pages, interactive code examples, and even custom components. Claude Code can scaffold entire static site sections.',
+   prompt:'Generate a clean HTML documentation page for our getting-started guide. Include: navigation, a hero section with quick-start steps, a code example block with syntax highlighting classes, and a "next steps" card grid.',
+   next:['markdown','artifacts','docsascode','claudecode']},
+  {id:'opendoc',label:'OpenAPI / Swagger',cat:'output',sz:28,
+   desc:'Claude reads OpenAPI specs and generates reference docs, code samples, and usage guides.',
+   narr:'If you have an OpenAPI spec, you already have most of what Claude needs to write your API reference. Give it the YAML, tell it the audience, and it will generate readable reference documentation — not just the raw parameter tables, but the explanations, the examples, the gotchas.',
+   prompt:'I\'ll paste an OpenAPI endpoint definition. Transform it into a human-readable reference documentation entry with: a plain English description, a parameters table, curl and Python request examples, and a sample response with field explanations.\n\n[PASTE OPENAPI YAML]',
+   next:['markdown','templates','api','agents']},
+  {id:'changelogs',label:'Changelogs',cat:'output',sz:24,
+   desc:'Auto-generate changelogs from Git commits, Jira tickets, or PR descriptions.',
+   narr:'Writing changelogs manually from commit history is one of the most tedious tasks in technical writing. Claude can read your Git log or PR list and generate a well-formatted, audience-appropriate changelog — categorising changes, writing user-facing descriptions, and following your release note template.',
+   prompt:'Here are 15 Git commit messages from our last sprint. Transform them into a user-facing changelog. Group them into: New features, Improvements, Bug fixes. Write each entry as a benefit to the user, not a technical description.\n\n[PASTE COMMITS]',
+   next:['github','versioning','templates','agents']},
+  {id:'templates',label:'Doc Templates',cat:'output',sz:28,
+   desc:'Claude generates and populates reusable templates — API stubs, release notes, how-to shells, READMEs.',
+   narr:'Templates are multipliers. One good template that Claude helps you create becomes the foundation for dozens of consistent documents. Claude can generate the template, populate it from a spec or API definition, and even critique drafts against it.',
+   prompt:'Create a reusable documentation template for a REST API endpoint. It should be a Markdown template with placeholder text showing exactly what to include in each section, and a brief comment explaining why each section matters.',
+   next:['markdown','promptlib','dita','opendoc']},
+  {id:'l10n',label:'Localisation',cat:'l10n',sz:38,
+   desc:'Claude as an L10n pre-processing layer: simplifying source text, flagging ambiguous phrases, generating translation-ready content.',
+   narr:'Before your docs go to a translator, Claude can do a pre-processing pass: simplify complex sentences, replace cultural idioms with neutral equivalents, flag potential translation ambiguities. This reduces translator queries and improves translation quality — especially for machine translation.',
+   prompt:'Review this documentation excerpt and prepare it for translation. Identify: (1) idioms that won\'t translate directly, (2) sentences that are too complex for translation, (3) cultural references that need localisation. Rewrite any problem sections.\n\n[PASTE EXCERPT]',
+   next:['terminology','translation','plainlang','glossary']},
+  {id:'terminology',label:'Terminology',cat:'l10n',sz:34,
+   desc:'Claude enforces controlled vocabulary, flags unapproved terms, suggests preferred synonyms, maintains your term base.',
+   narr:'Inconsistent terminology is one of the most common quality problems in technical documentation. "Click", "select", "tap", "press" — which do you use? Claude can check every document against your approved term list and flag violations before they reach review.',
+   prompt:'Here is my terminology list with preferred and prohibited terms. Review this documentation excerpt and: (1) flag every prohibited term, (2) suggest the preferred replacement, (3) identify any terms that should be added to my list.\n\n[PASTE TERM LIST]\n[PASTE EXCERPT]',
+   next:['glossary','styleguide','l10n','review']},
+  {id:'glossary',label:'Glossary',cat:'l10n',sz:26,
+   desc:'Claude generates, maintains, and enforces glossaries — define once, apply everywhere.',
+   narr:'A glossary is only useful if it\'s consistently applied. Claude can generate a glossary from your existing documentation, maintain it as your product evolves, and check every new doc against it. Define once, enforce everywhere.',
+   prompt:'Read this documentation excerpt and extract every technical term that should be in a glossary. For each term: provide a clear, user-facing definition, note any related terms, and flag if the term is used inconsistently across the excerpt.',
+   next:['terminology','l10n','knowledgebase','styleguide']},
+  {id:'translation',label:'Translation Assist',cat:'l10n',sz:28,
+   desc:'Claude translates drafts, reviews machine translations, adapts tone for regional audiences.',
+   narr:'Claude is not a replacement for professional translators for critical documentation. But it\'s excellent for: reviewing machine-translated content for obvious errors, adapting documentation tone for regional audiences, and translating internal docs and drafts that don\'t need professional sign-off.',
+   prompt:'Review this machine-translated technical documentation from [SOURCE LANGUAGE] to [TARGET LANGUAGE]. Identify: (1) translation errors, (2) awkward phrasing that reads as translated, (3) technical terms that weren\'t translated correctly. Provide corrected versions.',
+   next:['l10n','terminology','plainlang','review']},
+  {id:'plainlang',label:'Plain Language',cat:'l10n',sz:26,
+   desc:'Claude rewrites complex technical prose in plain language — reducing reading age, simplifying structures, improving accessibility.',
+   narr:'Plain language isn\'t dumbing down — it\'s respecting your reader\'s time. Documentation written at a reading age of 12 is understood faster by experts and understood at all by non-experts. Claude can rewrite any technical paragraph in plain language without losing accuracy.',
+   prompt:'Rewrite this technical paragraph in plain language. Target: a reading age of 12 on the Flesch-Kincaid scale. Keep all the technical accuracy — only simplify the sentence structure, word choice, and active/passive voice.\n\n[PASTE PARAGRAPH]',
+   next:['review','accessibility','l10n','styleguide']},
+  {id:'cicd',label:'CI/CD Integration',cat:'process',sz:30,
+   desc:'Claude in your docs pipeline: automated PR reviews, lint checks, link validation, build quality gates.',
+   narr:'The dream of Docs-as-Code is that quality checks happen automatically, not manually. CI/CD integration means Claude runs on every commit — checking for style violations, broken links, missing sections, or documentation gaps — before anything ships.',
+   prompt:'Design a CI/CD pipeline for a documentation site that includes Claude quality gates. What should Claude check on every PR? Write the GitHub Actions workflow YAML and the Claude prompts it would use.',
+   next:['docsascode','versioning','github','agents']},
+  {id:'versioning',label:'Version Control',cat:'process',sz:26,
+   desc:'Git-based versioning — branching strategies, PR-based review, keeping docs in sync with product versions.',
+   narr:'Version control for documentation isn\'t just about tracking changes — it\'s about aligning your docs with your product\'s release cycle. The right branching strategy means your docs for v2 and v3 can coexist, be reviewed separately, and ship on schedule.',
+   prompt:'I need a Git branching strategy for my documentation site that handles: (1) versioned docs for multiple product releases, (2) hotfix documentation, (3) draft content not yet ready for publish. What should it look like?',
+   next:['docsascode','cicd','github','ddlc']},
+  {id:'accessibility',label:'Accessibility',cat:'process',sz:28,
+   desc:'Claude checks docs for WCAG compliance, alt text, reading level, heading hierarchy, inclusive language.',
+   narr:'Accessibility in documentation is often checked last — or not at all. Claude can build accessibility review into your normal writing process: checking heading hierarchy, reading level, alt text completeness, and inclusive language before every publish.',
+   prompt:'Review this documentation page for accessibility issues. Check for: (1) correct heading hierarchy, (2) descriptive alt text on all images, (3) reading level above Flesch-Kincaid grade 12, (4) any potentially exclusionary language. Provide specific fixes for each issue found.',
+   next:['review','plainlang','governance','evaluation']},
+  {id:'contentaudit',label:'Content Audit',cat:'writing',sz:28,
+   desc:'Claude systematically reviews entire doc sites — stale content, coverage gaps, duplicate topics, broken IA.',
+   narr:'A content audit is one of the most painful manual tasks in documentation management. Claude can automate it: give it your site structure, give it access to your content, and ask it to identify what\'s stale, what\'s duplicated, and what\'s missing. Hours of work in minutes.',
+   prompt:'I\'m going to share my documentation site\'s table of contents. Analyse it for: (1) likely outdated topics based on naming patterns, (2) suspicious coverage gaps, (3) potential duplicate content, (4) topics that seem out of place. Output a prioritised action list.',
+   next:['review','rag','evaluation','docsascode']},
+  {id:'srchars',label:'SME Interviews',cat:'writing',sz:24,
+   desc:'Claude prepares interview questions, transcribes recordings, extracts facts, turns raw input into structured drafts.',
+   narr:'Getting knowledge out of a subject matter expert and into documentation is one of the hardest parts of technical writing. Claude can prepare your interview questions, process the transcript, extract the key facts, and turn them into a structured first draft — so the SME\'s time translates directly into content.',
+   prompt:'I have an interview with an SME about our new authentication system. Generate 15 interview questions that will give me everything I need to write: (1) a conceptual overview, (2) a how-to guide for setup, (3) a troubleshooting section.',
+   next:['prompting','ddlc','review','docsascode']},
+  {id:'subagents',label:'Sub-Agents',cat:'tools',sz:28,
+   desc:'Specialised agents delegated by a parent: a formatter, a reviewer, a link-checker — each handling one focused subtask.',
+   narr:'When you build an agent for a complex doc task, you often want to break it into specialists. A parent agent coordinates. Sub-agents specialise: one checks style, one validates links, one generates summaries, one writes the changelog. Each does one thing well.',
+   prompt:'Design a multi-agent documentation pipeline for a new API release. What sub-agents would you create, what is each one responsible for, and how do they hand off work to each other? Give me the architecture and the prompts.',
+   next:['agents','claudecode','cicd','evaluation']},
+];
+
+// Edges
+const EDEF=[
+  ['claude','models','uses'],['claude','projects','organises via'],
+  ['claude','artifacts','creates'],['claude','prompting','shaped by'],
+  ['claude','tools','extended by'],['claude','agents','powers'],
+  ['claude','mcp','connects via'],['claude','claudecode','runs as'],
+  ['claude','skills','configured by'],['claude','docsascode','integrates with'],
+  ['claude','api','accessed via'],
+  ['models','haiku','includes'],['models','sonnet','includes'],['models','opus','includes'],
+  ['models','agents','runs'],['models','evaluation','assessed by'],
+  ['tools','mcp','extended by'],['tools','websearch','enables'],['tools','codeexec','enables'],
+  ['tools','agents','orchestrates'],['tools','files','reads'],
+  ['mcp','connectors','exposes'],['mcp','github','integrates'],
+  ['mcp','gdrive','integrates'],['mcp','claudecode','used by'],
+  ['connectors','gdrive','includes'],['connectors','slack','includes'],['connectors','googledocs','includes'],
+  ['agents','subagents','delegates to'],['agents','evaluation','measured by'],['agents','cicd','triggers'],
+  ['claudecode','docsascode','automates'],['claudecode','cicd','runs in'],['claudecode','github','pushes to'],
+  ['skills','memory','generates'],['skills','custinstr','defines'],
+  ['skills','promptlib','stores'],['skills','personas','assigns'],
+  ['skills','styleguide','enforces'],['skills','docsascode','feeds into'],
+  ['custinstr','styleguide','applies'],
+  ['memory','projects','persists in'],['custinstr','projects','scoped to'],
+  ['promptlib','prompting','shapes'],['personas','prompting','frames'],
+  ['github','docsascode','enables'],['github','versioning','provides'],['github','cicd','triggers'],
+  ['notion','knowledgebase','feeds'],['notion','projects','syncs with'],
+  ['confluence','contentaudit','source for'],['confluence','docsascode','migrates to'],
+  ['googledocs','gdrive','stored in'],['googledocs','review','submitted for'],
+  ['slack','projects','linked to'],['vscode','claudecode','runs'],
+  ['rag','knowledgebase','queries'],['rag','embeddings','uses'],
+  ['rag','semantic','powered by'],['rag','docingest','fed by'],
+  ['knowledgebase','projects','stored in'],['knowledgebase','docsascode','versioned in'],
+  ['knowledgebase','terminology','aligned to'],
+  ['embeddings','semantic','enables'],['docingest','files','processes'],['rag','agents','used by'],
+  ['docsascode','ddlc','structures'],['docsascode','review','feeds'],
+  ['docsascode','styleguide','governed by'],['docsascode','markdown','outputs'],['docsascode','versioning','uses'],
+  ['ddlc','review','includes'],['ddlc','styleguide','references'],
+  ['ddlc','governance','subject to'],['ddlc','srchars','begins with'],
+  ['styleguide','review','criteria for'],['styleguide','terminology','aligns'],
+  ['review','evaluation','measured by'],['review','accessibility','checks'],
+  ['contentaudit','rag','informs'],['contentaudit','evaluation','drives'],
+  ['srchars','prompting','uses'],
+  ['markdown','templates','uses'],['markdown','changelogs','generates'],
+  ['dita','templates','populates'],['dita','terminology','enforces'],
+  ['opendoc','api','documents'],['opendoc','templates','generates from'],
+  ['changelogs','github','sourced from'],['changelogs','versioning','tracks'],
+  ['templates','promptlib','stored in'],['html','docsascode','part of'],
+  ['l10n','terminology','manages'],['l10n','translation','enables'],
+  ['l10n','plainlang','requires'],['l10n','glossary','maintains'],
+  ['terminology','glossary','populates'],['terminology','review','checked in'],
+  ['plainlang','review','improves'],['plainlang','accessibility','supports'],
+  ['evaluation','governance','informs'],['evaluation','cicd','gates'],
+  ['governance','accessibility','mandates'],['governance','review','oversees'],
+  ['cicd','versioning','manages'],['versioning','github','stored in'],
+  ['api','agents','powers'],['api','rag','enables'],
+  ['context','projects','managed via'],['context','memory','extends via'],['context','rag','augmented by'],
+  ['files','review','submitted for'],['files','docingest','ingested as'],
+  ['vscode','markdown','edits'],
+];
+
+// Missing nodes referenced in edges/next
+ND.push(
+  {id:'context',label:'Context Window',cat:'core',sz:30,
+   desc:'How much Claude can see in one conversation. Managing it well determines output consistency at scale.',
+   narr:'The context window is Claude\'s working memory. Everything it can act on right now has to fit in here. Understanding the limits — and how Projects, RAG, and chunking work around them — is essential for working with long documents.',
+   prompt:'I\'m working with a 50,000-word documentation site. How should I structure my Claude workflow to deal with context window limits? What strategies help me get consistent output across long projects?',
+   next:['projects','memory','rag','prompting']},
+  {id:'artifacts',label:'Artifacts',cat:'core',sz:30,
+   desc:'Files Claude creates inline — Markdown, HTML, React, PDFs. Exportable directly into your pipeline.',
+   narr:'An Artifact is a file Claude creates that lives in the conversation. You can download it, copy it, or share it. For documentation, this means Claude can generate a complete Markdown page, a DITA topic, or an HTML component — and you pull it straight into your repo.',
+   prompt:'Generate a complete documentation artifact for me: a getting-started guide in Markdown for a REST API. It should be production-ready, include all standard sections, and follow Google developer documentation style.',
+   next:['markdown','dita','html','docsascode']}
+);
+
+const ADJ={};
+ND.forEach(n=>ADJ[n.id]=[]);
+EDEF.forEach(([s,t,l])=>{
+  if(ADJ[s]!==undefined&&ADJ[t]!==undefined){
+    ADJ[s].push({id:t,label:l,dir:'out'});
+    ADJ[t].push({id:s,label:l,dir:'in'});
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// WELCOME SCREEN
+// ═══════════════════════════════════════════════════════════════════
+let selectedRole=null;
+const rolesEl=document.getElementById('wl-roles');
+ROLES.forEach(r=>{
+  const card=document.createElement('div');
+  card.className='role-card';
+  card.style.setProperty('--role-col',r.color);
+  card.innerHTML=`<span class="role-icon">${r.icon}</span><div class="role-name">${r.name}</div><div class="role-desc">${r.desc}</div>`;
+  card.addEventListener('click',()=>{
+    document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+    card.classList.add('sel');
+    selectedRole=r;
+    document.getElementById('wl-start').disabled=false;
+    document.getElementById('wl-start').textContent=`Start ${r.name} walkthrough →`;
+  });
+  rolesEl.appendChild(card);
+});
+
+document.getElementById('wl-start').addEventListener('click',()=>{
+  const steps=selectedRole.steps.slice();
+  dismissWelcome();
+  waitForSimThenStart(steps);
+});
+document.getElementById('wl-skip').addEventListener('click',()=>dismissWelcome());
+
+function dismissWelcome(){
+  const w=document.getElementById('welcome');
+  if(!w)return;
+  w.classList.add('out');
+  setTimeout(()=>{if(w&&w.parentNode)w.parentNode.removeChild(w)},700);
+}
+
+function waitForSimThenStart(steps){
+  // Poll until sim has settled — nodes need real positions for flyTo to work
+  const first=steps.find(id=>simN.find(n=>n.id===id));
+  function tryStart(){
+    const n=simN.find(d=>d.id===first);
+    if(n && (Math.abs(n.x)>20 || Math.abs(n.y)>20)){
+      startWalkthrough(steps);
+    } else {
+      setTimeout(tryStart,150);
+    }
+  }
+  setTimeout(tryStart,750); // wait for welcome fade first
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// D3 GRAPH
+// ═══════════════════════════════════════════════════════════════════
+const gc=document.getElementById('gc');
+let W=gc.offsetWidth,H=gc.offsetHeight;
+const isMob=()=>window.innerWidth<=768;
+
+const svg=d3.select('#gc').append('svg').attr('width',W).attr('height',H).style('display','block');
+const defs=svg.append('defs');
+
+// Dot grid
+defs.append('pattern').attr('id','dg').attr('width',36).attr('height',36)
+  .attr('patternUnits','userSpaceOnUse')
+  .append('circle').attr('cx',18).attr('cy',18).attr('r',.6).attr('fill','rgba(255,255,255,0.05)');
+
+// Arrow markers
+Object.keys(CC).forEach(cat=>{
+  const col=cv(cat);
+  defs.append('marker').attr('id','ar-'+cat)
+    .attr('viewBox','0 0 10 10').attr('refX',9).attr('refY',5)
+    .attr('markerWidth',5).attr('markerHeight',5).attr('orient','auto')
+    .append('path').attr('d','M1 2L8 5L1 8').attr('fill','none')
+    .attr('stroke',col).attr('stroke-width',1.8)
+    .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+});
+defs.append('marker').attr('id','ar-dim')
+  .attr('viewBox','0 0 10 10').attr('refX',9).attr('refY',5)
+  .attr('markerWidth',5).attr('markerHeight',5).attr('orient','auto')
+  .append('path').attr('d','M1 2L8 5L1 8').attr('fill','none')
+  .attr('stroke','rgba(255,255,255,0.12)').attr('stroke-width',1.5)
+  .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+
+// Edge glow
+const ef=defs.append('filter').attr('id','egf')
+  .attr('x','-40%').attr('y','-40%').attr('width','180%').attr('height','180%');
+ef.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','3').attr('result','b');
+const em=ef.append('feMerge');
+em.append('feMergeNode').attr('in','b');em.append('feMergeNode').attr('in','SourceGraphic');
+
+const zg=svg.append('g');
+zg.append('rect').attr('x',-5000).attr('y',-5000).attr('width',12000).attr('height',12000)
+  .attr('fill','url(#dg)');
+
+const hullL=zg.append('g');
+const zoneLblL=zg.append('g'); // persistent zone labels
+const linkL=zg.append('g');
+const glowL=zg.append('g');
+const eLblL=zg.append('g');
+const nodeL=zg.append('g');
+
+const zoomB=d3.zoom().scaleExtent([.15,5]).on('zoom',e=>zg.attr('transform',e.transform));
+svg.call(zoomB).on('dblclick.zoom',null);
+
+// Simulation
+const simN=ND.map(d=>({...d}));
+const simE=EDEF.filter(([s,t])=>simN.find(n=>n.id===s)&&simN.find(n=>n.id===t))
+  .map(([s,t,l])=>({source:s,target:t,label:l}));
+
+simN.forEach(d=>{
+  const cl=CLUSTER[d.cat]||[.5,.5];
+  d.x=cl[0]*W+(Math.random()-.5)*120;d.y=cl[1]*H+(Math.random()-.5)*120;
+});
+
+const sim=d3.forceSimulation(simN)
+  .force('link',d3.forceLink(simE).id(d=>d.id)
+    .distance(d=>(d.source.sz+d.target.sz)*1.6+50).strength(.28))
+  .force('charge',d3.forceManyBody().strength(d=>-d.sz*28))
+  .force('collision',d3.forceCollide(d=>d.sz+18).strength(.84))
+  .force('cluster',alpha=>{
+    simN.forEach(d=>{
+      const cl=CLUSTER[d.cat]||[.5,.5];
+      d.vx+=(cl[0]*W-d.x)*alpha*.056;
+      d.vy+=(cl[1]*H-d.y)*alpha*.056;
+    });
+  })
+  .alphaDecay(.011).velocityDecay(.42);
+
+const lSel=linkL.selectAll('line').data(simE).enter().append('line')
+  .attr('stroke','rgba(255,255,255,0.065)').attr('stroke-width',1.1)
+  .attr('marker-end','url(#ar-dim)');
+const gSel=glowL.selectAll('line').data(simE).enter().append('line')
+  .attr('stroke','rgba(255,255,255,0)').attr('stroke-width',3.5).attr('filter','url(#egf)');
+const eLSel=eLblL.selectAll('text').data(simE).enter().append('text')
+  .attr('text-anchor','middle').attr('font-family','JetBrains Mono,monospace')
+  .attr('font-size',8.5).attr('fill','rgba(255,255,255,0)').attr('pointer-events','none');
+
+const nSel=nodeL.selectAll('g').data(simN).enter().append('g')
+  .style('cursor','pointer')
+  .call(d3.drag()
+    .on('start',(e,d)=>{if(!e.active)sim.alphaTarget(.22).restart();d.fx=d.x;d.fy=d.y})
+    .on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y})
+    .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null}));
+
+nSel.append('circle').attr('r',d=>d.sz+22).attr('fill','rgba(0,0,0,0)').attr('class','natm');
+nSel.append('circle').attr('r',d=>d.sz+10).attr('fill',d=>cv(d.cat)+'18').attr('class','nglow');
+nSel.append('circle').attr('r',d=>d.sz).attr('fill',d=>cv(d.cat)+'26')
+  .attr('stroke',d=>cv(d.cat)).attr('stroke-width',1.8).attr('class','nbody');
+nSel.append('circle').attr('r',d=>d.sz*.25).attr('cx',d=>-d.sz*.18).attr('cy',d=>-d.sz*.18)
+  .attr('fill',d=>cv(d.cat)+'50').attr('class','nspot');
+nSel.append('text').attr('text-anchor','middle').attr('fill','#eef0f8')
+  .attr('font-family','Cabinet Grotesk,sans-serif').attr('font-weight','700')
+  .attr('font-size',d=>Math.max(10,Math.min(14,d.sz*.34)))
+  .attr('class','nlbl').style('pointer-events','none').style('user-select','none')
+  .each(function(d){
+    const el=d3.select(this),w=d.label.split(' ');
+    if(w.length===1){el.attr('dy','.35em').text(d.label);return}
+    const mid=Math.ceil(w.length/2);
+    el.append('tspan').attr('x',0).attr('dy','-.55em').text(w.slice(0,mid).join(' '));
+    el.append('tspan').attr('x',0).attr('dy','1.2em').text(w.slice(mid).join(' '));
+  });
+
+// Zone label elements (persistent, rendered in graph space)
+const ZONE_POS={
+  core:[.50,.46],model:[.50,.16],tools:[.20,.40],skills:[.28,.68],integr:[.18,.21],
+  rag:[.74,.26],writing:[.72,.60],output:[.50,.78],l10n:[.82,.43],process:[.30,.86]
+};
+const ZONE_NAMES={core:'CORE',model:'MODELS',tools:'TOOLS',skills:'SKILLS',integr:'INTEGRATIONS',
+  rag:'RAG',writing:'WRITING',output:'OUTPUT',l10n:'L10N',process:'GOVERNANCE'};
+const zoneEls={};
+Object.entries(ZONE_NAMES).forEach(([cat,label])=>{
+  zoneEls[cat]=zoneLblL.append('text')
+    .attr('class','zone-lbl')
+    .attr('text-anchor','middle')
+    .attr('font-size',11)
+    .attr('fill',cv(cat)+'55')
+    .attr('stroke',cv(cat)+'22')
+    .attr('stroke-width',4)
+    .attr('letter-spacing','.16em')
+    .text(label);
+});
+
+function ep(d){
+  const sx=d.source.x,sy=d.source.y,tx=d.target.x,ty=d.target.y;
+  const dx=tx-sx,dy=ty-sy,len=Math.sqrt(dx*dx+dy*dy)||1;
+  const ux=dx/len,uy=dy/len;
+  const sr=d.source.sz+10,tr=d.target.sz+14;
+  return{x1:sx+ux*sr,y1:sy+uy*sr,x2:tx-ux*tr,y2:ty-uy*tr,mx:(sx+tx)/2,my:(sy+ty)/2};
+}
+
+// Cluster centroids for zone labels
+const centroids={};
+
+sim.on('tick',()=>{
+  lSel.each(function(d){const p=ep(d);d3.select(this).attr('x1',p.x1).attr('y1',p.y1).attr('x2',p.x2).attr('y2',p.y2)});
+  gSel.each(function(d){const p=ep(d);d3.select(this).attr('x1',p.x1).attr('y1',p.y1).attr('x2',p.x2).attr('y2',p.y2)});
+  eLSel.each(function(d){const p=ep(d);d3.select(this).attr('x',p.mx).attr('y',p.my-5)});
+  nSel.attr('transform',d=>`translate(${d.x},${d.y})`);
+  drawHulls();
+  updateZoneLabels();
+});
+
+function updateZoneLabels(){
+  const byCat={};
+  simN.forEach(d=>{(byCat[d.cat]=byCat[d.cat]||[]).push(d)});
+  Object.entries(byCat).forEach(([cat,nodes])=>{
+    if(!zoneEls[cat])return;
+    const cx=nodes.reduce((s,n)=>s+n.x,0)/nodes.length;
+    const cy=nodes.reduce((s,n)=>s+n.y,0)/nodes.length;
+    // Place label above the centroid
+    const minY=Math.min(...nodes.map(n=>n.y-n.sz));
+    zoneEls[cat].attr('x',cx).attr('y',minY-18);
+    centroids[cat]={x:cx,y:cy};
+  });
+}
+
+function drawHulls(){
+  const byCat={};
+  simN.forEach(d=>{(byCat[d.cat]=byCat[d.cat]||[]).push({x:d.x,y:d.y,sz:d.sz})});
+  const polys=[];
+  Object.entries(byCat).forEach(([cat,nodes])=>{
+    const exp=[];
+    nodes.forEach(({x,y,sz})=>{
+      const r=sz+50;
+      for(let a=0;a<Math.PI*2;a+=Math.PI/10)exp.push([x+Math.cos(a)*r,y+Math.sin(a)*r]);
+    });
+    if(exp.length<3)return;
+    try{const h=d3.polygonHull(exp);if(h)polys.push({cat,h})}catch(e){}
+  });
+  const sel=hullL.selectAll('path').data(polys,d=>d.cat);
+  sel.enter().append('path').merge(sel)
+    .attr('d',d=>'M'+d.h.map(p=>p.join(',')).join('L')+'Z')
+    .attr('fill',d=>cv(d.cat)+'09')
+    .attr('stroke',d=>cv(d.cat)+'25')
+    .attr('stroke-width',1.5).attr('stroke-linejoin','round')
+    .attr('stroke-dasharray','7 9').style('pointer-events','none');
+  sel.exit().remove();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HIGHLIGHT
+// ═══════════════════════════════════════════════════════════════════
+let selId=null,activePath=null;
+function gpc(k){return k==='w'?cv('writing'):k==='a'?cv('process'):cv('core')}
+const PATHS={b:['claude','prompting','projects','skills','tools','agents','evaluation'],
+  w:['claude','prompting','skills','custinstr','styleguide','docsascode','ddlc','review'],
+  a:['mcp','connectors','rag','knowledgebase','agents','subagents','governance']};
+
+function hl(pk,nid){
+  const pIds=pk?PATHS[pk]:null;
+  const adjIds=nid?ADJ[nid].map(r=>r.id):null;
+  const pc=pk?gpc(pk):null;
+  const pp=new Set();
+  if(pIds)for(let i=0;i<pIds.length-1;i++){pp.add(pIds[i]+'|'+pIds[i+1]);pp.add(pIds[i+1]+'|'+pIds[i])}
+
+  nSel.each(function(d){
+    const el=d3.select(this),col=cv(d.cat);
+    const inP=pIds&&pIds.includes(d.id),isSel=d.id===nid,isAdj=adjIds&&adjIds.includes(d.id);
+    const dim=(pIds||nid)&&!inP&&!isSel&&!isAdj;
+    el.select('.nbody').attr('stroke-width',isSel?3.5:inP?3:1.8)
+      .attr('stroke',isSel?'#fff':inP?(pc||col):col)
+      .attr('fill',isSel?col+'60':inP?col+'40':col+'26').attr('opacity',dim?.09:1);
+    el.select('.nglow').attr('r',(isSel||inP)?d.sz+22:d.sz+10)
+      .attr('fill',(isSel||inP)?col+'38':col+'18').attr('opacity',dim?.05:1);
+    el.select('.natm').attr('fill',(isSel||inP)?col+'11':'rgba(0,0,0,0)');
+    el.select('.nspot').attr('opacity',dim?.03:1);
+    el.select('.nlbl').attr('fill',dim?'rgba(255,255,255,.1)':isSel?'#fff':inP?'#fff':'#eef0f8')
+      .attr('font-weight',(isSel||inP)?'900':'700').attr('opacity',dim?.18:1);
+  });
+  lSel.each(function(d){
+    const a=d.source.id||d.source,b=d.target.id||d.target;
+    const inP=pp.has(a+'|'+b),isAdj=nid&&(a===nid||b===nid);
+    const dim=(pIds||nid)&&!inP&&!isAdj;
+    const sn=simN.find(n=>n.id===a);
+    d3.select(this).attr('stroke',inP?pc:isAdj?'rgba(255,255,255,.28)':'rgba(255,255,255,.065)')
+      .attr('stroke-width',inP?2.5:isAdj?1.8:1.1)
+      .attr('opacity',dim?.025:inP||isAdj?1:.5)
+      .attr('marker-end',dim?'url(#ar-dim)':inP||isAdj?`url(#ar-${(sn||{cat:'dim'}).cat})`:'url(#ar-dim)');
+  });
+  gSel.each(function(d){
+    const a=d.source.id||d.source,b=d.target.id||d.target;
+    const inP=pp.has(a+'|'+b),isAdj=nid&&(a===nid||b===nid);
+    d3.select(this).attr('stroke',inP?pc+'aa':isAdj?'rgba(255,255,255,.14)':'rgba(255,255,255,0)')
+      .attr('stroke-width',inP?4:3.5);
+  });
+  eLSel.each(function(d){
+    const a=d.source.id||d.source,b=d.target.id||d.target;
+    const show=nid&&(a===nid||b===nid);
+    const sn=simN.find(n=>n.id===a);
+    d3.select(this).attr('fill',show?(cv((sn||{cat:'core'}).cat)+'bb'):'rgba(255,255,255,0)')
+      .text(show?d.label:'');
+  });
+}
+
+function clearHL(){
+  nSel.each(function(d){
+    const col=cv(d.cat);
+    d3.select(this).select('.nbody').attr('stroke-width',1.8).attr('stroke',col).attr('fill',col+'26').attr('opacity',1);
+    d3.select(this).select('.nglow').attr('r',d.sz+10).attr('fill',col+'18').attr('opacity',1);
+    d3.select(this).select('.natm').attr('fill','rgba(0,0,0,0)');
+    d3.select(this).select('.nspot').attr('opacity',1);
+    d3.select(this).select('.nlbl').attr('fill','#eef0f8').attr('font-weight','700').attr('opacity',1);
+  });
+  lSel.attr('stroke','rgba(255,255,255,0.065)').attr('stroke-width',1.1).attr('opacity',1).attr('marker-end','url(#ar-dim)');
+  gSel.attr('stroke','rgba(255,255,255,0)').attr('stroke-width',3.5);
+  eLSel.attr('fill','rgba(255,255,255,0)').text('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CAMERA
+// ═══════════════════════════════════════════════════════════════════
+function flyTo(id,scale=1.5){
+  const n=simN.find(d=>d.id===id);
+  if(!n)return;
+  const tx=W/2-n.x*scale,ty=H/2-n.y*scale;
+  svg.transition().duration(700).ease(d3.easeCubicInOut)
+    .call(zoomB.transform,d3.zoomIdentity.translate(tx,ty).scale(scale));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// WALKTHROUGH
+// ═══════════════════════════════════════════════════════════════════
+let wtSteps=[],wtIdx=0,wtActive=false;
+
+function startWalkthrough(steps){
+  wtSteps=steps.filter(id=>simN.find(n=>n.id===id));
+  if(!wtSteps.length)return;
+  wtIdx=0;wtActive=true;
+  const wtEl=document.getElementById('wt');
+  wtEl.style.display='flex';
+  // Small delay to let display:flex apply before opacity transition
+  setTimeout(()=>{
+    wtEl.classList.add('show');
+    showWtStep(0);
+  },20);
+}
+
+function showWtStep(idx){
+  if(idx<0||idx>=wtSteps.length)return;
+  wtIdx=idx;
+  const id=wtSteps[idx];
+  const nd=simN.find(n=>n.id===id);
+  if(!nd)return;
+
+  // Progress bar
+  document.getElementById('wt-fill').style.width=((idx+1)/wtSteps.length*100)+'%';
+  document.getElementById('wt-num').textContent=(idx+1)+' of '+wtSteps.length;
+  document.getElementById('wt-name').textContent=nd.label;
+  document.getElementById('wt-name').style.color=cv(nd.cat);
+  document.getElementById('wt-narr').textContent=nd.narr||nd.desc||'';
+
+  // Prompt
+  const promptText=nd.prompt||'Ask Claude about this topic.';
+  document.getElementById('wt-prompt-text').textContent=promptText;
+
+  // Try link
+  const tryLink=document.getElementById('wt-try');
+  tryLink.href='https://claude.ai/new?q='+encodeURIComponent(promptText);
+  document.getElementById('wt-try-sub').textContent=promptText.slice(0,70)+(promptText.length>70?'…':'');
+
+  // Dots
+  const dotsEl=document.getElementById('wt-dots');
+  dotsEl.innerHTML='';
+  wtSteps.forEach((_,i)=>{
+    const dot=document.createElement('div');
+    dot.className='wt-dot'+(i===idx?' on':'');
+    dot.addEventListener('click',()=>showWtStep(i));
+    dotsEl.appendChild(dot);
+  });
+
+  // Nav buttons
+  const prevBtn=document.getElementById('wt-prev');
+  const nextBtn=document.getElementById('wt-next');
+  prevBtn.disabled=(idx===0);
+  prevBtn.style.opacity=(idx===0)?'0.35':'1';
+  nextBtn.textContent=(idx===wtSteps.length-1)?'Finish ✓':'Next →';
+
+  // Copy button reset
+  const copyBtn=document.getElementById('wt-copy');
+  copyBtn.textContent='Copy';copyBtn.classList.remove('done');
+
+  // Highlight node + fly camera
+  selId=id; activePath=null;
+  document.querySelectorAll('.prow,.hbtn').forEach(el=>el.classList.remove('on'));
+  hl(null,id);
+  flyTo(id, isMob()?1.1:1.5);
+
+  // On mobile show sidebar below wt panel; on desktop show sidebar
+  if(!isMob()){
+    openSB(nd);
+  } else {
+    // Just update sidebar content silently without opening it on mobile
+    // so the walkthrough panel isn't obscured
+    populateSBContent(nd);
+  }
+}
+
+function endWalkthrough(){
+  wtActive=false;
+  const wtEl=document.getElementById('wt');
+  wtEl.classList.remove('show');
+  setTimeout(()=>{ wtEl.style.display='none'; },350);
+  selId=null;clearHL();closeSB();
+}
+
+document.getElementById('wt-prev').addEventListener('click',()=>{ if(wtIdx>0)showWtStep(wtIdx-1) });
+document.getElementById('wt-next').addEventListener('click',()=>{
+  if(wtIdx<wtSteps.length-1)showWtStep(wtIdx+1);
+  else endWalkthrough();
+});
+document.getElementById('wt-exit').addEventListener('click',endWalkthrough);
+document.getElementById('btng').addEventListener('click',()=>{
+  if(wtActive){endWalkthrough()}
+  else{
+    const steps=['claude','prompting','projects','skills','tools','mcp','rag','docsascode','ddlc','review'];
+    startWalkthrough(steps);
+  }
+});
+
+// Walkthrough copy
+document.getElementById('wt-copy').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  const text=document.getElementById('wt-prompt-text').textContent;
+  const btn=document.getElementById('wt-copy');
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('done');
+    showToast('Prompt copied!');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done')},2000);
+  }).catch(()=>{ fallbackCopy(text); btn.textContent='Copied!';btn.classList.add('done');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done')},2000); });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════════════
+function populateSBContent(nd){
+  const col=cv(nd.cat);
+  document.getElementById('sb-dot').style.background=col;
+  document.getElementById('sb-cat').textContent=CL[nd.cat]||nd.cat;
+  document.getElementById('sb-cat').style.color=col;
+  document.getElementById('sb-name').textContent=nd.label;
+  document.getElementById('sb-name').style.color=col;
+  document.getElementById('sb-desc').textContent=nd.desc||'';
+
+  const prompt=nd.prompt||'Tell me about '+nd.label+' in the context of technical writing.';
+  const cta=document.getElementById('sb-cta');
+  cta.href='https://claude.ai/new?q='+encodeURIComponent(prompt);
+  document.getElementById('sb-cta-sub').textContent=prompt.slice(0,65)+(prompt.length>65?'…':'');
+  document.getElementById('sb-prompt').textContent=prompt;
+  document.getElementById('sb-copy-lbl').textContent='Copy prompt';
+  document.getElementById('sb-copy').classList.remove('done');
+
+  const nextEl=document.getElementById('sb-next');nextEl.innerHTML='';
+  const nextIds=nd.next||ADJ[nd.id].slice(0,4).map(r=>r.id);
+  nextIds.slice(0,5).forEach(nid=>{
+    const cn=simN.find(n=>n.id===nid);if(!cn)return;
+    const rel=ADJ[nd.id]&&ADJ[nd.id].find(r=>r.id===nid);
+    const item=document.createElement('div');item.className='sb-next-item';
+    const cnCol=cv(cn.cat);
+    item.innerHTML='<div class="sb-next-dot" style="background:'+cnCol+'"></div>'
+      +'<div class="sb-next-label" style="color:'+cnCol+'">'+cn.label+'</div>'
+      +'<div class="sb-next-rel">'+(rel?rel.label:'related')+'</div>'
+      +'<div class="sb-next-arr">→</div>';
+    item.addEventListener('click',ev=>{
+      ev.stopPropagation();selId=cn.id;hl(null,cn.id);flyTo(cn.id,1.5);openSB(cn);
+    });
+    nextEl.appendChild(item);
+  });
+}
+
+function openSB(nd){
+  populateSBContent(nd);
+  // On mobile during walkthrough, sidebar covers the WT panel — suppress it
+  if(isMob()&&wtActive) return;
+  document.getElementById('sb').classList.add('open');
+  document.getElementById('sbbk').classList.add('show');
+  if(!isMob())document.getElementById('paths').classList.add('shift');
+}
+
+function closeSB(){
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('sbbk').classList.remove('show');
+  if(!wtActive) document.getElementById('paths').classList.remove('shift');
+}
+
+// Close button — both click and touchend for Android reliability
+const sbXBtn = document.getElementById('sb-x');
+function doCloseSB(e){
+  e.preventDefault();
+  e.stopPropagation();
+  selId=null;
+  if(!activePath&&!wtActive)clearHL();
+  closeSB();
+}
+sbXBtn.addEventListener('click', doCloseSB);
+sbXBtn.addEventListener('touchend', doCloseSB, {passive:false});
+
+document.getElementById('sbbk').addEventListener('click',()=>{
+  selId=null;if(!activePath&&!wtActive)clearHL();closeSB();
+});
+
+// About modal
+document.getElementById('btn-about').addEventListener('click',()=>{
+  document.getElementById('about-modal').classList.add('show');
+});
+document.getElementById('btn-about').addEventListener('touchend',(e)=>{
+  e.preventDefault();
+  document.getElementById('about-modal').classList.add('show');
+},{passive:false});
+const aboutCloseBtn = document.getElementById('about-close');
+function closeAbout(e){
+  e.preventDefault();e.stopPropagation();
+  document.getElementById('about-modal').classList.remove('show');
+}
+aboutCloseBtn.addEventListener('click',closeAbout);
+aboutCloseBtn.addEventListener('touchend',closeAbout,{passive:false});
+document.getElementById('about-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('about-modal'))
+    document.getElementById('about-modal').classList.remove('show');
+});
+
+// Sidebar prompt copy
+document.getElementById('sb-copy').addEventListener('click',()=>{
+  const text=document.getElementById('sb-prompt').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('sb-copy');
+    const lbl=document.getElementById('sb-copy-lbl');
+    btn.classList.add('done');lbl.textContent='Copied!';
+    showToast('Prompt copied!');
+    setTimeout(()=>{btn.classList.remove('done');lbl.textContent='Copy prompt'},2000);
+  }).catch(()=>fallbackCopy(text));
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// NODE EVENTS
+// ═══════════════════════════════════════════════════════════════════
+const tip=document.getElementById('tip');
+nSel
+  .on('mouseover',(e,d)=>{
+    if(selId||activePath||wtActive)return;
+    const col=cv(d.cat);
+    d3.select(e.currentTarget).select('.nbody').attr('stroke-width',2.5).attr('fill',col+'48');
+    d3.select(e.currentTarget).select('.nglow').attr('r',d.sz+22).attr('fill',col+'28');
+    tip.textContent=d.label;
+    tip.style.left=(e.clientX+16)+'px';tip.style.top=(e.clientY-14)+'px';
+    tip.classList.add('show');
+  })
+  .on('mousemove',e=>{tip.style.left=(e.clientX+16)+'px';tip.style.top=(e.clientY-14)+'px'})
+  .on('mouseout',(e,d)=>{
+    if(selId||activePath||wtActive)return;
+    const col=cv(d.cat);
+    d3.select(e.currentTarget).select('.nbody').attr('stroke-width',1.8).attr('fill',col+'26');
+    d3.select(e.currentTarget).select('.nglow').attr('r',d.sz+10).attr('fill',col+'18');
+    tip.classList.remove('show');
+  })
+  .on('click',(e,d)=>{
+    e.stopPropagation();tip.classList.remove('show');
+    // If walkthrough is active, clicking a node just opens its sidebar without killing the guide
+    activePath=null;
+    document.querySelectorAll('.prow,.hbtn').forEach(el=>el.classList.remove('on'));
+    if(selId===d.id){
+      selId=null;
+      if(!wtActive)clearHL();
+      closeSB();
+    } else {
+      selId=d.id;
+      hl(null,d.id);
+      openSB(d);
+      if(wtActive){
+        // Check if this node is in current walkthrough; if so, jump to it
+        const stepIdx=wtSteps.indexOf(d.id);
+        if(stepIdx>=0){
+          wtIdx=stepIdx;
+          showWtStep(wtIdx);
+        }
+      }
+    }
+  });
+svg.on('click',()=>{selId=null;if(!activePath&&!wtActive)clearHL();closeSB()});
+
+// ═══════════════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════════════
+const srchEl=document.getElementById('srch');
+const sresEl=document.getElementById('sres');
+const srchClr=document.getElementById('srch-clr');
+let srchIdx=0;
+
+function positionSearchResults(){
+  const wrap=document.getElementById('search-wrap');
+  if(!wrap)return;
+  const rect=wrap.getBoundingClientRect();
+  sresEl.style.left=rect.left+'px';
+  sresEl.style.right=(window.innerWidth-rect.right)+'px';
+  sresEl.style.top=(rect.bottom+4)+'px';
+  sresEl.style.margin='0';
+}
+
+function doSearch(q){
+  const t=q.toLowerCase().trim();
+  srchClr.classList.toggle('show',t.length>0);
+  if(!t){sresEl.classList.remove('show');return}
+  const m=simN.filter(n=>
+    n.label.toLowerCase().includes(t)||n.id.toLowerCase().includes(t)||
+    (n.desc&&n.desc.toLowerCase().includes(t))||(CL[n.cat]&&CL[n.cat].toLowerCase().includes(t))
+  ).slice(0,8);
+  if(!m.length){
+    sresEl.innerHTML='<div class="sri-empty">No results for "'+q+'"</div>';
+    sresEl.classList.add('show');return;
+  }
+  sresEl.innerHTML='';
+  m.forEach((n,i)=>{
+    const item=document.createElement('div');item.className='sri'+(i===0?' ak':'');
+    item.dataset.id=n.id;
+    const col=cv(n.cat);
+    item.innerHTML=`<div class="sri-dot" style="background:${col}"></div>
+      <span class="sri-label" style="color:${col}">${n.label}</span>
+      <span class="sri-cat">${CL[n.cat]||n.cat}</span>`;
+    item.addEventListener('click',()=>selectResult(n));
+    sresEl.appendChild(item);
+  });
+  sresEl.classList.add('show');srchIdx=0;
+  positionSearchResults();
+}
+
+function selectResult(n){
+  srchEl.value='';sresEl.classList.remove('show');srchClr.classList.remove('show');
+  if(wtActive)endWalkthrough();
+  selId=n.id;activePath=null;
+  document.querySelectorAll('.prow,.hbtn').forEach(el=>el.classList.remove('on'));
+  hl(null,n.id);flyTo(n.id,1.5);openSB(n);
+}
+
+srchEl.addEventListener('input',e=>doSearch(e.target.value));
+srchEl.addEventListener('keydown',e=>{
+  const items=sresEl.querySelectorAll('.sri');
+  if(!items.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();srchIdx=Math.min(srchIdx+1,items.length-1)}
+  else if(e.key==='ArrowUp'){e.preventDefault();srchIdx=Math.max(srchIdx-1,0)}
+  else if(e.key==='Enter'){
+    const ak=sresEl.querySelector('.sri.ak');
+    if(ak){const n=simN.find(d=>d.id===ak.dataset.id);if(n)selectResult(n)}return;
+  }else if(e.key==='Escape'){sresEl.classList.remove('show');srchEl.blur();return}
+  items.forEach((item,i)=>item.classList.toggle('ak',i===srchIdx));
+});
+srchClr.addEventListener('click',()=>{srchEl.value='';sresEl.classList.remove('show');srchClr.classList.remove('show');srchEl.focus()});
+document.addEventListener('click',e=>{if(!e.target.closest('#search-wrap')&&!e.target.closest('#sres'))sresEl.classList.remove('show')});
+
+// ═══════════════════════════════════════════════════════════════════
+// PATHS
+// ═══════════════════════════════════════════════════════════════════
+function doPath(key,bid,rid){
+  if(activePath===key){activePath=null;clearHL();
+    document.getElementById(bid).classList.remove('on');
+    document.getElementById(rid).classList.remove('on');return}
+  if(wtActive)endWalkthrough();
+  activePath=key;selId=null;closeSB();
+  document.querySelectorAll('.prow,.hbtn').forEach(el=>el.classList.remove('on'));
+  document.getElementById(bid).classList.add('on');
+  document.getElementById(rid).classList.add('on');
+  hl(key,null);
+}
+document.getElementById('bb').addEventListener('click',()=>doPath('b','bb','pr-b'));
+document.getElementById('bw').addEventListener('click',()=>doPath('w','bw','pr-w'));
+document.getElementById('ba').addEventListener('click',()=>doPath('a','ba','pr-a'));
+document.getElementById('pr-b').addEventListener('click',()=>doPath('b','bb','pr-b'));
+document.getElementById('pr-w').addEventListener('click',()=>doPath('w','bw','pr-w'));
+document.getElementById('pr-a').addEventListener('click',()=>doPath('a','ba','pr-a'));
+
+// ═══════════════════════════════════════════════════════════════════
+// LEGEND
+// ═══════════════════════════════════════════════════════════════════
+document.querySelectorAll('.leg-i').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const cat=item.dataset.cat;selId=null;activePath=null;closeSB();
+    if(wtActive)endWalkthrough();
+    document.querySelectorAll('.prow,.hbtn').forEach(el=>el.classList.remove('on'));
+    nSel.each(function(d){
+      const dim=d.cat!==cat,col=cv(d.cat);
+      d3.select(this).select('.nbody').attr('opacity',dim?.06:1).attr('stroke-width',dim?1.8:2.5).attr('fill',col+(dim?'08':'48'));
+      d3.select(this).select('.nglow').attr('fill',dim?col+'00':col+'35').attr('r',dim?d.sz+10:d.sz+22).attr('opacity',dim?.04:1);
+      d3.select(this).select('.nlbl').attr('fill',dim?'rgba(255,255,255,.07)':'#fff').attr('opacity',dim?.07:1);
+      d3.select(this).select('.nspot').attr('opacity',dim?.02:1);
+    });
+    lSel.attr('opacity',.02).attr('marker-end','url(#ar-dim)');
+    gSel.attr('stroke','rgba(255,255,255,0)');
+    // Fly to cluster centroid
+    if(centroids[cat]){
+      const cx=centroids[cat].x,cy=centroids[cat].y;
+      svg.transition().duration(700).call(zoomB.transform,
+        d3.zoomIdentity.translate(W/2-cx*1.2,H/2-cy*1.2).scale(1.2));
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// ZOOM & RESET
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('br').addEventListener('click',()=>{
+  selId=null;activePath=null;if(wtActive)endWalkthrough();
+  clearHL();closeSB();
+  document.querySelectorAll('.prow,.hbtn').forEach(el=>el.classList.remove('on'));
+  svg.transition().duration(650).call(zoomB.transform,d3.zoomIdentity);
+});
+document.getElementById('zi').addEventListener('click',()=>svg.transition().duration(260).call(zoomB.scaleBy,1.5));
+document.getElementById('zo').addEventListener('click',()=>svg.transition().duration(260).call(zoomB.scaleBy,.67));
+document.getElementById('zf').addEventListener('click',()=>svg.transition().duration(480).call(zoomB.transform,d3.zoomIdentity));
+
+// ═══════════════════════════════════════════════════════════════════
+// SHARE
+// ═══════════════════════════════════════════════════════════════════
+const SURL='https://kamalraj21.github.io/claude-for-tw/';
+const STXT='I built an interactive knowledge graph of Claude for technical writers — guided walkthroughs, copyable prompts, 55 nodes. Explore it here:';
+document.getElementById('shr-li').addEventListener('click',()=>
+  window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(SURL),'_blank','noopener,width=600,height=600'));
+document.getElementById('shr-tw').addEventListener('click',()=>
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(STXT+'\n\n'+SURL)+'&hashtags=TechnicalWriting,Claude,AI,DocsAsCode','_blank','noopener,width=600,height=500'));
+document.getElementById('shr-cp').addEventListener('click',()=>{
+  navigator.clipboard.writeText(SURL).then(()=>{
+    document.getElementById('shr-cp').classList.add('done');
+    document.getElementById('cplbl').textContent='Copied!';
+    showToast('Link copied!');
+    setTimeout(()=>{document.getElementById('shr-cp').classList.remove('done');document.getElementById('cplbl').textContent='Copy link'},2400);
+  }).catch(()=>fallbackCopy(SURL));
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');ta.value=text;
+  ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);
+  ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  showToast('Copied!');
+}
+
+window.addEventListener('resize',()=>{
+  W=gc.offsetWidth;H=gc.offsetHeight;
+  svg.attr('width',W).attr('height',H);
+  sim.force('cluster',alpha=>{
+    simN.forEach(d=>{
+      const cl=CLUSTER[d.cat]||[.5,.5];
+      d.vx+=(cl[0]*W-d.x)*alpha*.056;d.vy+=(cl[1]*H-d.y)*alpha*.056;
+    });
+  }).alpha(.3).restart();
+});
+</script>
+</body>
+</html>
